@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/goods_info"
+            android:icon="@drawable/ic_heysweetie"
+            android:title="点餐" />
+        <item
+            android:id="@+id/goods_order"
+            android:icon="@drawable/ic_menu"
+            android:title="订单" />
+        <item
+            android:id="@+id/user_info"
+            android:icon="@drawable/ic_settings"
+            android:title="个人信息" />
+        <item
+            android:id="@+id/shop_cart"
+            android:icon="@drawable/ic_heysweetie"
+            android:title="购物车" />
+        <item
+            android:id="@+id/human_service"
+            android:icon="@drawable/ic_comment"
+            android:title="人工客服" />
+    </group>
+</menu>

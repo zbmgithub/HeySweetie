@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/goods_onSale"
+            android:icon="@drawable/ic_menu"
+            android:title="在售商品" />
+        <item
+            android:id="@+id/order_manage"
+            android:icon="@drawable/ic_menu"
+            android:title="订单管理" />
+        <item
+            android:id="@+id/goods_manage"
+            android:icon="@drawable/ic_menu"
+            android:title="商品管理" />
+        <item
+            android:id="@+id/admin_manage"
+            android:icon="@drawable/ic_settings"
+            android:title="系统用户管理" />
+        <item
+            android:id="@+id/statistic"
+            android:icon="@drawable/ic_menu"
+            android:title="统计数据" />
+        <item
+            android:id="@+id/msg_manage"
+            android:icon="@drawable/ic_comment"
+            android:title="留言管理" />
+        <item
+            android:id="@+id/repository_manage"
+            android:icon="@drawable/ic_menu"
+            android:title="库存管理" />
+
+    </group>
+</menu>
