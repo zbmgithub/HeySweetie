@@ -11,7 +11,7 @@ import cn.bmob.v3.Bmob;
 public class HeySweetieApplication extends Application {
     @SuppressLint("StatisticFieldLeak")
     public static Context context;//全局获取Context
-    public static final String ApplicationID = "";//Bmob接口id
+    public static final String ApplicationID = "7bc8330964e0ceca10d1a6934d6679f7";//Bmob接口id
 
     @Override
     public void onCreate() {
