@@ -1,6 +1,7 @@
 package com.heysweetie.android.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.ui.client.GoodsDetailActivity;
 
 import java.util.List;
 
@@ -50,6 +52,16 @@ public class GoodsAdapter extends RecyclerView.Adapter<GoodsAdapter.ViewHolder> 
 
         Glide.with(context).load(goods.getImageId()).into(holder.goodsImage);
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, GoodsDetailActivity.class);
+                intent.putExtra("goods_data",goods);
+                context.startActivity(intent);
+                if(context.getClass() == GoodsDetailActivity.class)
+                    ((GoodsDetailActivity) context).finish();
+            }
+        });
     }
 
     @Override

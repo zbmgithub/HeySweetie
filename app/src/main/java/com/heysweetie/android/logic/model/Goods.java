@@ -1,11 +1,14 @@
 package com.heysweetie.android.logic.model;
 
+import android.util.Log;
+
+import java.io.Serializable;
 import java.util.Date;
 
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 
-public class Goods extends BmobObject {
+public class Goods extends BmobObject implements Serializable {
     //父类默认有唯一标志 String objectId; 作为商品编号
     private int goodsState = 0;//商品状态 0代表上架不折扣，1代表上架折扣，2代表下架
     private String goodsSortName = "";//商品类别
@@ -106,5 +109,23 @@ public class Goods extends BmobObject {
     public void setImageId(int imageId) {
         this.imageId = imageId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Goods p = (Goods) obj;
+        if (!this.getObjectId().equals(p.getObjectId()))
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return getObjectId().hashCode();
+    }
+
 
 }

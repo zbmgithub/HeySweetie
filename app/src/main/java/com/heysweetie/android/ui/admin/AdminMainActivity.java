@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -24,15 +25,18 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 
 import com.heysweetie.android.logic.model.User;
 import com.heysweetie.android.ui.GoodsAdapter;
+import com.heysweetie.android.ui.client.GoodsDetailActivity;
 import com.heysweetie.android.ui.login.LoginActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import cn.bmob.v3.BmobBatch;
 import cn.bmob.v3.BmobObject;
@@ -50,13 +54,15 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
     private DrawerLayout drawerLayout;
     private TextView phoneText;
     private TextView nickName;
-    private FloatingActionButton navBtn;
     private Button quitBtn;
     private SwipeRefreshLayout swipeRefresh;
 
     private RecyclerView goods_recyclerView;
     private MaterialToolbar toolbar;
+    private TextView shopCartTotalPrice;
+    private TextView shopCartTotalCount;
 
+    private TextView goToDeal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,15 +79,19 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             drawerLayout = findViewById(R.id.drawerLayout);
             phoneText = (TextView) navView.getHeaderView(0).findViewById(R.id.phoneText);//获取navView的header!!!!
             nickName = (TextView) navView.getHeaderView(0).findViewById(R.id.nickNameText);
-            navBtn = (FloatingActionButton) findViewById(R.id.navBtn);
             quitBtn = (Button) navView.getHeaderView(0).findViewById(R.id.quitBtn);
             toolbar = findViewById(R.id.toolBar);
             goods_recyclerView = findViewById(R.id.goods_recyclerView);
             swipeRefresh = findViewById(R.id.swipeRefresh);
+            shopCartTotalPrice = findViewById(R.id.shopCartTotalPrice);
+            shopCartTotalCount = findViewById(R.id.shopCartTotalCount);
+            goToDeal = findViewById(R.id.goToDeal);
         }
         //设置自定义标题栏
         toolbar.setTitle("所有上架商品");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
         User user = (User) getIntent().getSerializableExtra("user_data");
         phoneText.setText(user.getMobilePhoneNumber());
@@ -103,15 +113,15 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             }
         });
 
-        navBtn.setOnClickListener(this);//悬浮按钮设置监听事件
         quitBtn.setOnClickListener(this);//滑动菜单的右上角，有个垃圾箱标志，退出登录功能
-
+        goToDeal.setOnClickListener(this);//去结算点击事件
 
         //设置recycler布局方式
         refreshGoods(goods_recyclerView);//刷新商品界面
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         goods_recyclerView.setLayoutManager(layoutManager);
 
+        //save();
         //设置下拉刷新显示商品界面
         swipeRefresh.setColorSchemeResources(R.color.design_default_color_primary);//刷新颜色
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -120,6 +130,31 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
                 refreshGoods(goods_recyclerView);
             }
         });
+    }
+
+    public void refreshShopCar() {
+        double price = 0;//购物车总价
+        int count = 0;//购物商品数量
+        //获取购物车所有的商品
+        Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
+        for (Goods key : keys) {
+            int tempCount = HeySweetieApplication.shopCartMap.get(key);
+            count += tempCount;
+            //当前购物车总价=当前商品价格*折扣*数量+其余商品...
+            price += key.getPrice() * key.getSale() * tempCount;
+        }
+        //设置为两位小数
+        double priceOutput = Double.parseDouble(String.format("%.2f", price));
+        shopCartTotalPrice.setText(priceOutput + "");
+
+        //设置购物车数量显示
+        shopCartTotalCount.setText(count + "");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        refreshShopCar();
     }
 
     private void refreshGoods(RecyclerView recyclerView) {
@@ -133,12 +168,25 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
                     goodsList.addAll(object);//将获取的商品添加到列表
                     GoodsAdapter adapter = new GoodsAdapter(AdminMainActivity.this, goodsList);//所有商品添加到适配器
                     goods_recyclerView.setAdapter(adapter);//为recyclerView设置适配器
+
+                    //刷新购物车中的商品价格
+                    for (Goods goods : goodsList) {
+                        if (HeySweetieApplication.shopCartMap.containsKey(goods)) {
+                            //由于重写了equal()和hashcode方法，所以即使goods信息已经改变，也会匹配上
+                            int count = HeySweetieApplication.shopCartMap.get(goods);//获取之前的数量
+                            HeySweetieApplication.shopCartMap.remove(goods);//删除key
+                            HeySweetieApplication.shopCartMap.put(goods, count);//放入新的key
+                        }
+                    }
+
+                    //结束刷新
                     swipeRefresh.setRefreshing(false);
                     Toast.makeText(AdminMainActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
                 } else {
                 }
             }
         });
+
     }
 
     private void save() {
@@ -212,7 +260,18 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             finish();
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
+        } else if (getId == R.id.goToDeal) {
+            Toast.makeText(AdminMainActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
+            HeySweetieApplication.shopCartMap.clear();
+            refreshShopCar();
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
