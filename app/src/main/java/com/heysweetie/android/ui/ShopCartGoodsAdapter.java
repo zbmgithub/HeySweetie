@@ -1,5 +1,6 @@
 package com.heysweetie.android.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -15,9 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.heysweetie.android.HeySweetieApplication;
+import com.heysweetie.android.MainActivity;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.ui.admin.AdminMainActivity;
+import com.heysweetie.android.ui.client.ClientMainActivity;
 import com.heysweetie.android.ui.client.GoodsDetailActivity;
+import com.heysweetie.android.ui.client.ShopCartActivity;
 
 import java.util.List;
 import java.util.Map;
@@ -67,10 +72,19 @@ public class ShopCartGoodsAdapter extends RecyclerView.Adapter<ShopCartGoodsAdap
                     count--;
                     HeySweetieApplication.shopCartMap.put(goods, count);
                     holder.goodsCount.setText(count + "");
+
                     double price = goods.getPrice() * goods.getSale() * count;
                     double priceOutput = Double.parseDouble(String.format("%.2f", price));
                     holder.goodsPrice.setText("¥ " + priceOutput + "");
-                    GoodsDetailActivity.refreshShopCar();
+                    //刷新购物栏
+                    if ((Activity) context instanceof GoodsDetailActivity)
+                        GoodsDetailActivity.refreshShopCar();
+                    if ((Activity) context instanceof MainActivity)
+                        AdminMainActivity.refreshShopCar();
+                    if ((Activity) context instanceof ClientMainActivity)
+                        ClientMainActivity.refreshShopCar();
+                    if ((Activity) context instanceof ShopCartActivity)
+                        ShopCartActivity.refreshShopCar();
                 }
             }
         });
@@ -86,11 +100,18 @@ public class ShopCartGoodsAdapter extends RecyclerView.Adapter<ShopCartGoodsAdap
                 HeySweetieApplication.shopCartMap.put(goods, count);
                 holder.goodsCount.setText(count + "");
 
-
                 double price = goods.getPrice() * goods.getSale() * count;
                 double priceOutput = Double.parseDouble(String.format("%.2f", price));
                 holder.goodsPrice.setText("¥ " + priceOutput + "");
-                GoodsDetailActivity.refreshShopCar();
+                //刷新购物栏
+                if ((Activity) context instanceof GoodsDetailActivity)
+                    GoodsDetailActivity.refreshShopCar();
+                if ((Activity) context instanceof MainActivity)
+                    AdminMainActivity.refreshShopCar();
+                if ((Activity) context instanceof ClientMainActivity)
+                    ClientMainActivity.refreshShopCar();
+                if ((Activity) context instanceof ShopCartActivity)
+                    ShopCartActivity.refreshShopCar();
             }
         });
         return holder;

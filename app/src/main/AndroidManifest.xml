@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HeySweetie">
-        <activity android:name=".ui.client.GoodsDetailActivity"></activity>
+        <activity android:name=".ui.client.ShopCartActivity"></activity>
+        <activity android:name=".ui.client.GoodsDetailActivity" />
         <activity android:name=".ui.admin.GoodsManageActivity" />
         <activity android:name=".ui.admin.AdminMainActivity" />
         <activity android:name=".ui.client.ClientMainActivity" />

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.ColorSpace;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,9 +53,8 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
     private static TextView shopCartTotalCount;
     private LinearLayout shor_cart;
     private RecyclerView shopCartRecyclerView;
-    private MaterialCardView shopCartView;
+    private static MaterialCardView shopCartView;
     private TextView cleanShopCart;
-    private LinearLayout goodsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,49 +65,36 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         goods = (Goods) intent.getSerializableExtra("goods_data");
         //初始化控件
         initControlUnit();
-
-        //设置商品界面
-        Glide.with(this).load(goods.getImageId()).into(goodsImage);//设置商品图片
-        toolbar.setTitle(goods.getGoodsName());//设置标题栏文字为商品名
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        goodsProfile.setText(goods.getGoodsProfile());
-        double currenPrice = goods.getPrice() * goods.getSale();
-        salePrice.setText("售价：" + currenPrice + "元");
-        //设置当前商品数量
-        int count = 0;
-        if (HeySweetieApplication.shopCartMap.containsKey(goods)) {
-            count = HeySweetieApplication.shopCartMap.get(goods);
+        //设置显示界面
+        {
+            Glide.with(this).load(goods.getImageId()).into(goodsImage);//显示商品图片为传递过来的商品图片
+            toolbar.setTitle(goods.getGoodsName());//设置标题栏文字为商品名
+            setSupportActionBar(toolbar);//显示标题栏为自定义标题栏
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);//设置home按钮
+            goodsProfile.setText(goods.getGoodsProfile());//显示商品简介
+            double currenPrice = goods.getPrice() * goods.getSale();//显示当前商品价格
+            salePrice.setText("售价：" + currenPrice + "元");
+            int count = HeySweetieApplication.shopCartMap.get(goods) == null ? 0 : HeySweetieApplication.shopCartMap.get(goods);
+            countText.setText(count + "");//设置当前商品数量为购物车中的数量
+            refreshShopCar();//刷新购物车栏
+            //在当前商品页面同时显示其他商品的广告图，设置goode_recycler布局方式
+            elseGoods(goods_recyclerView);//获取其他商品界面
+            GridLayoutManager layoutManager = new GridLayoutManager(this, 2);//设置其他商品显示布局
+            goods_recyclerView.setLayoutManager(layoutManager);
         }
-        countText.setText(count + "");
-        refreshShopCar();//刷新购物车
-
-        //获取其他商品
-        //设置goode_recycler布局方式
-        elseGoods(goods_recyclerView);//获取其他商品界面
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        goods_recyclerView.setLayoutManager(layoutManager);
-
 
         //设置按钮监听事件
-        minusCountBtn.setOnClickListener(this);
-        addCountBtn.setOnClickListener(this);
-        goToDeal.setOnClickListener(this);
-        shor_cart.setOnClickListener(this);//查看购物车详情
-        cleanShopCart.setOnClickListener(this);
-
+        {
+            minusCountBtn.setOnClickListener(this);
+            addCountBtn.setOnClickListener(this);
+            goToDeal.setOnClickListener(this);
+            shor_cart.setOnClickListener(this);//查看购物车详情
+            cleanShopCart.setOnClickListener(this);//清空购物车
+        }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        refreshShopCar();
-    }
-
-    //当前商品界面同时显示其他商品
+    //当前商品界面同时显示其他商品，设置适配器
     private void elseGoods(RecyclerView recyclerView) {
-        //设置recyclerview,浏览商品界面
         List<Goods> goodsList = new ArrayList<>();
         BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
         query.setLimit(500).setSkip(1).order("-createdAt").addWhereNotEqualTo("goodsState", 2).findObjects(new FindListener<Goods>() {
@@ -151,7 +138,6 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         shopCartRecyclerView = findViewById(R.id.shopCartRecyclerView);
         shopCartView = findViewById(R.id.shopCartView);
         cleanShopCart = findViewById(R.id.cleanShopCart);
-        goodsView = findViewById(R.id.goodsView);
     }
 
     @Override//点击事件处理
@@ -162,8 +148,8 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         if (id == R.id.minusCountBtn) {
             if (count > 0) {//减少数量
                 count--;
-                HeySweetieApplication.shopCartMap.put(goods, count);
-                countText.setText(count + "");
+                HeySweetieApplication.shopCartMap.put(goods, count);//将减少后的数量放进购物车
+                countText.setText(count + "");//设置数量显示
             }
         } else if (id == R.id.addCountBtn) {//添加数量
             count++;
@@ -171,30 +157,31 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
             countText.setText(count + "");
         } else if (id == R.id.goToDeal) {//去结算
             Toast.makeText(GoodsDetailActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
-            addCountBtn.setEnabled(true);
+
+            addCountBtn.setEnabled(true);//这样设置显示是为了处理某些数据不同步可能产生的bug
             minusCountBtn.setEnabled(true);
             countText.setText("0");
             HeySweetieApplication.shopCartMap.clear();
             shopCartView.setVisibility(View.GONE);
         } else if (id == R.id.shop_cart) {//点击购物车
-            if (shopCartView.getVisibility() == View.GONE) {
-                //设置可见性
+            if (shopCartView.getVisibility() == View.GONE) {//显示购物车详细信息
+                //设置可见性 这样设置显示是为了处理count数据不同步可能产生的bug
                 addCountBtn.setEnabled(false);
                 minusCountBtn.setEnabled(false);
                 shopCartView.setVisibility(View.VISIBLE);
-                //构造购物车界面
+                //构造购物车详细信息界面
                 List<Goods> goodsList = new ArrayList<>();
                 Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
                 for (Goods key : keys) {
                     if (HeySweetieApplication.shopCartMap.get(key) > 0) {
-                        goodsList.add(key);
+                        goodsList.add(key);//获取所有数量大于0的商品
                     }
                 }
                 ShopCartGoodsAdapter adapter = new ShopCartGoodsAdapter(GoodsDetailActivity.this, goodsList);//所有商品添加到适配器
                 shopCartRecyclerView.setAdapter(adapter);//为recyclerView设置适配器
                 shopCartRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
             } else {
-                //设置可见性
+                //设置可见性 再次点击购物车栏关闭购物车详细信息
                 addCountBtn.setEnabled(true);
                 minusCountBtn.setEnabled(true);
                 shopCartView.setVisibility(View.GONE);
@@ -204,9 +191,9 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
             minusCountBtn.setEnabled(true);
             countText.setText("0");
             HeySweetieApplication.shopCartMap.clear();
-            shopCartView.setVisibility(View.GONE);
+            closeShopCarListView();
         }
-        refreshShopCar();
+        refreshShopCar();//每次点击后都刷新一次购物车栏，这样它可以实现动态变化
     }
 
     //刷新购物栏（最下方一行）
@@ -231,5 +218,9 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         countText.setText(i + "");//当前页面的商品数量
     }
 
+    //关闭购物车详细信息
+    public static void closeShopCarListView() {
+        shopCartView.setVisibility(View.GONE);
+    }
 
 }

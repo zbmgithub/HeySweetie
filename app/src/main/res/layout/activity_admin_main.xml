@@ -52,55 +52,122 @@
                 <include layout="@layout/current_goods_layout" />
             </androidx.core.widget.NestedScrollView>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <!--购物车详细信息，默认不显示，再点击之后再显示-->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/shopCartView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="55dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            app:cardCornerRadius="10dp">
 
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="#dedede">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/cleanShopCart"
+                        android:paddingRight="15dp"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:text="清空购物车"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/shopCartRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!--购物车栏-->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
             android:layout_margin="5dp"
             app:cardCornerRadius="10dp">
 
             <LinearLayout
+                android:id="@+id/shop_cart"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:background="#eee">
+                android:background="#dedede"
+                android:clickable="true"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical|left"
-                    android:paddingLeft="30dp"
-                    android:text="¥"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/shopCartTotalPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical|left"
-                    android:paddingLeft="10dp"
-                    android:text="0"
-                    android:textSize="20sp" />
-
-                <TextView
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="7"
-                    android:gravity="center_vertical|left"
-                    android:paddingLeft="10dp"
-                    android:text="元"
-                    android:textSize="20sp" />
-                <TextView
-                    android:id="@+id/shopCartTotalCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
-                    android:textColor="#FF1493"/>
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|left"
+                        android:paddingLeft="30dp"
+                        android:text="¥"
+                        android:textSize="20sp"
+                        android:textColor="#FF1493"/>
+
+                    <TextView
+                        android:id="@+id/shopCartTotalPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|left"
+                        android:paddingLeft="10dp"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textColor="#FF1493"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:gravity="center_vertical|left"
+                        android:paddingLeft="10dp"
+                        android:text="元"
+                        android:textSize="20sp"
+                        android:textColor="#FF1493"/>
+
+                    <TextView
+                        android:id="@+id/shopCartTotalCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:text="0"
+                        android:textColor="#FF1493"
+                        android:textSize="20sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:text="杯"
+                        android:textSize="20sp"
+                        android:textColor="#FF1493"
+                        android:layout_marginRight="20dp"/>
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/goToDeal"
                     android:layout_width="90dp"

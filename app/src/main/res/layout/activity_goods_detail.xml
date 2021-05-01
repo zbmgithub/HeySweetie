@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/goodsView">
-
+    <!--全局界面-->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start|top"
         android:fitsSystemWindows="true">
-
+        <!--折叠式标题栏-->
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="250dp"
@@ -40,7 +40,7 @@
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
-
+        <!--商品简介+加入购物车按键+其他上架商品展示-->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -131,7 +131,7 @@
                     android:layout_height="match_parent" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
+        <!--购物车详细信息，默认不显示，再点击之后再显示-->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/shopCartView"
             android:layout_width="match_parent"
@@ -177,7 +177,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
+        <!--购物车栏-->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
