@@ -67,6 +67,9 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         initControlUnit();
         //设置显示界面
         {
+            //半透明状态栏
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
             Glide.with(this).load(goods.getImageId()).into(goodsImage);//显示商品图片为传递过来的商品图片
             toolbar.setTitle(goods.getGoodsName());//设置标题栏文字为商品名
             setSupportActionBar(toolbar);//显示标题栏为自定义标题栏

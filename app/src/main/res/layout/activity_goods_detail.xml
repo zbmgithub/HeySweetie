@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/goodsView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/goodsView">
+    android:orientation="vertical">
     <!--全局界面-->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -22,13 +22,14 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-                app:contentScrim="#D8BFD8"
+                app:contentScrim="@color/purple_500"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView
                     android:id="@+id/goodsImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax" />
 
@@ -137,9 +138,9 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="55dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
+            android:layout_marginBottom="55dp"
             android:visibility="gone"
             app:cardCornerRadius="10dp">
 
@@ -147,8 +148,8 @@
 
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="#dedede">
+                android:background="#dedede"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -162,11 +163,11 @@
 
                     <TextView
                         android:id="@+id/cleanShopCart"
-                        android:paddingRight="15dp"
-                        android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_gravity="center"
                         android:clickable="true"
+                        android:paddingRight="15dp"
                         android:text="清空购物车"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -204,8 +205,8 @@
                         android:gravity="center_vertical|left"
                         android:paddingLeft="30dp"
                         android:text="¥"
-                        android:textSize="20sp"
-                        android:textColor="#FF1493"/>
+                        android:textColor="#FF1493"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/shopCartTotalPrice"
@@ -214,8 +215,8 @@
                         android:gravity="center_vertical|left"
                         android:paddingLeft="10dp"
                         android:text="0"
-                        android:textSize="20sp"
-                        android:textColor="#FF1493"/>
+                        android:textColor="#FF1493"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -224,8 +225,8 @@
                         android:gravity="center_vertical|left"
                         android:paddingLeft="10dp"
                         android:text="元"
-                        android:textSize="20sp"
-                        android:textColor="#FF1493"/>
+                        android:textColor="#FF1493"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/shopCartTotalCount"
@@ -236,15 +237,16 @@
                         android:text="0"
                         android:textColor="#FF1493"
                         android:textSize="20sp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:layout_gravity="center"
+                        android:layout_marginRight="20dp"
+                        android:gravity="center"
                         android:text="杯"
-                        android:textSize="20sp"
                         android:textColor="#FF1493"
-                        android:layout_marginRight="20dp"/>
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <TextView

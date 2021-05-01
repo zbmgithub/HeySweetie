@@ -54,6 +54,8 @@ import cn.bmob.v3.listener.QueryListListener;
 
 public class AdminMainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private User user;
+
     private NavigationView navView;
     private DrawerLayout drawerLayout;
     private TextView phoneText;
@@ -91,7 +93,7 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
-            User user = (User) getIntent().getSerializableExtra("user_data");
+            user = (User) getIntent().getSerializableExtra("user_data");
             phoneText.setText(user.getMobilePhoneNumber());
             nickName.setText(user.getUserNickName());
 
@@ -118,9 +120,15 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    if (item.getItemId() == R.id.goods_onSale)
+                    int id = item.getItemId();
+                    if (id == R.id.goods_onSale)
                         drawerLayout.closeDrawers();//默认购物界面为主界面，所以关闭就好
-                    else {
+                    else if (id == R.id.goods_manage) {
+                        Intent intent = new Intent(AdminMainActivity.this, GoodsManageActivity.class);
+                        if (user.getAdmin() > 0) {
+                            startActivity(intent);
+                        }
+                    } else {
                         drawerLayout.closeDrawers();
                         Toast.makeText(AdminMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();
                     }

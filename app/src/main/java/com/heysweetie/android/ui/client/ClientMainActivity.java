@@ -139,6 +139,7 @@ public class ClientMainActivity extends AppCompatActivity implements View.OnClic
     private void initView() {
         //设置自定义标题栏
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
         user = (User) getIntent().getSerializableExtra("user_data");
         phoneText.setText(user.getMobilePhoneNumber());
@@ -254,5 +255,14 @@ public class ClientMainActivity extends AppCompatActivity implements View.OnClic
     //关闭购物车详细信息
     public static void closeShopCarListView(){
         shopCartView.setVisibility(View.GONE);
+    }
+
+    //打开菜单栏
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
