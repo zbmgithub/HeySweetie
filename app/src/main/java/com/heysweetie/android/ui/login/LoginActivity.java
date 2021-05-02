@@ -54,55 +54,62 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //初始化界面
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //初始化控件
+        initControlUnit();
+        //初始化界面
+        initView();
+        //设置按钮监听
+        initClick();
+
+    }
+
+    private void initControlUnit() {
+        accountEdit = findViewById(R.id.accountEdit);
+        passwordEdit = findViewById(R.id.passwordEdit);
+        loginBtn = findViewById(R.id.loginBtn);
+        registerBtn = findViewById(R.id.registerBtn);
+        rememberPass = findViewById(R.id.rememberPassCheckBox);
+        //注册时使用
+        registerPassLt = findViewById(R.id.registerPassLayout);
+        registerVtCodeLt = findViewById(R.id.registerVtCodeLayout);
+        registerBtnLt = findViewById(R.id.registerBtnLayout);
+        loginBtnLt = findViewById(R.id.loginBtnLayout);
+        passwordEdit2 = findViewById(R.id.passwordEdit2);
+        vtCodeEdit = findViewById(R.id.vtCodeEdit);
+        vtCodeBtn = findViewById(R.id.vtCodeBtn);
+        okBtn = findViewById(R.id.okBtn);
+        cancelBtn = findViewById(R.id.cancelBtn);
+        progressBar = findViewById(R.id.progressBar);
+    }
+
+    private void initView() {
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        //获取控件实例--登录时使用
-        {
-            accountEdit = findViewById(R.id.accountEdit);
-            passwordEdit = findViewById(R.id.passwordEdit);
-            loginBtn = findViewById(R.id.loginBtn);
-            registerBtn = findViewById(R.id.registerBtn);
-            rememberPass = findViewById(R.id.rememberPassCheckBox);
-            //注册时使用
-            registerPassLt = findViewById(R.id.registerPassLayout);
-            registerVtCodeLt = findViewById(R.id.registerVtCodeLayout);
-            registerBtnLt = findViewById(R.id.registerBtnLayout);
-            loginBtnLt = findViewById(R.id.loginBtnLayout);
-            passwordEdit2 = findViewById(R.id.passwordEdit2);
-            vtCodeEdit = findViewById(R.id.vtCodeEdit);
-            vtCodeBtn = findViewById(R.id.vtCodeBtn);
-            okBtn = findViewById(R.id.okBtn);
-            cancelBtn = findViewById(R.id.cancelBtn);
-            progressBar = findViewById(R.id.progressBar);
+        //初始化登录账号和密码框
+        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        boolean isRemember = sharedPreferences.getBoolean("isRemember", false);
+        if (isRemember) {
+            accountEdit.setText(sharedPreferences.getString("account", ""));
+            passwordEdit.setText(sharedPreferences.getString("password", ""));
+            rememberPass.setChecked(true);
         }
-        //实现记住密码功能-part1-初始化
-        {
-            SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-            boolean isRemember = sharedPreferences.getBoolean("isRemember", false);
-            if (isRemember) {
-                accountEdit.setText(sharedPreferences.getString("account", ""));
-                passwordEdit.setText(sharedPreferences.getString("password", ""));
-                rememberPass.setChecked(true);
+    }
+
+    private void initClick() {
+        loginBtn.setOnClickListener(this);
+        registerBtn.setOnClickListener(this);
+        vtCodeBtn.setOnClickListener(this);
+        okBtn.setOnClickListener(this);
+        cancelBtn.setOnClickListener(this);
+        rememberPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                savePass();//保存密码，根据是否勾选动态保存密码
             }
-            rememberPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    savePass();//保存密码，根据是否勾选动态保存密码
-                }
-            });
-        }
-        //设置按钮监听
-        {
-            loginBtn.setOnClickListener(this);
-            registerBtn.setOnClickListener(this);
-            vtCodeBtn.setOnClickListener(this);
-            okBtn.setOnClickListener(this);
-            cancelBtn.setOnClickListener(this);
-        }
+        });
     }
 
     @Override
@@ -141,12 +148,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String phone = accountEdit.getText().toString();//获取输入的手机号
         String code = vtCodeEdit.getText().toString();//获取用户输入的验证码
         String password = passwordEdit.getText().toString();//获取用户输入的密码
-        signOrLogin(phone, code, password);//进行注册
+        sign_up(phone, code, password);//进行注册
         cancel();
     }
 
-    //    一键注册或登录的同时保存其他字段的数据
-    private void signOrLogin(String phone, String code, String password) {
+    // 注册
+    private void sign_up(String phone, String code, String password) {
         final User user = new User();//创建一个新的User对象
         user.setMobilePhoneNumber(phone);//设置手机号码（必填）
         user.setUsername(phone);//设置用户名（登录账号）默认为手机号码
@@ -188,12 +195,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             passwordEdit2.setEnabled(false);
 
             //发送验证码
-
             BmobSMS.requestSMSCode(phoneNumber, "", new QueryListener<Integer>() {
                 @Override
                 public void done(Integer smsId, BmobException e) {
                     if (e == null) {
-                        Toast.makeText(LoginActivity.this, "发送验证码成功，短信ID：" + smsId, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "发送验证码成功", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(LoginActivity.this, "发送验证码失败：" + e.getErrorCode() + "-" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -231,8 +237,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private boolean isValidPassword(String str) {
-        //密码的正则规则 8到12位  包含数字 字母 特殊字符!@.,()
-        return str.matches("^[\\w_!@#$%^&*`~()-+=]{6,20}$");
+        //密码的正则规则 6到20位  包含数字 字母 特殊字符!@.,()
+        return str.matches("^[\\w!@#$%^&*`~()-+=]{6,20}$");
     }
 
     private void register() {
@@ -256,9 +262,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void done(User bmobUser, BmobException e) {
                 if (e == null) {
                     User user = BmobUser.getCurrentUser(User.class);
-                    //Snackbar.make(v, "登录成功：" + user.getUsername(), Snackbar.LENGTH_LONG).show();
                     Intent intent;
-                    //Log.d("User",user.getAdmin()+"");
                     if (user.getAdmin() == 0) {
                         intent = new Intent(LoginActivity.this, ClientMainActivity.class);
                         intent.putExtra("user_data", user);

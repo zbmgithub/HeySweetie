@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -25,49 +24,42 @@ import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.GoodsAdapter;
-import com.heysweetie.android.ui.ShopCartGoodsAdapter;
-import com.heysweetie.android.ui.client.GoodsDetailActivity;
+import com.heysweetie.android.ui.common.GoodsAdapter;
+import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 import com.heysweetie.android.ui.login.LoginActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import cn.bmob.v3.BmobBatch;
-import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.datatype.BatchResult;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.QueryListListener;
 
 
 public class AdminMainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private User user;
-
+    //滑动菜单组件
     private NavigationView navView;
     private DrawerLayout drawerLayout;
     private TextView phoneText;
     private TextView nickName;
     private Button quitBtn;
-    private SwipeRefreshLayout swipeRefresh;
 
+    //主界面组件
+    private SwipeRefreshLayout swipeRefresh;
     private RecyclerView goods_recyclerView;
     private MaterialToolbar toolbar;
     private static TextView shopCartTotalPrice;
     private static TextView shopCartTotalCount;
-
     private TextView goToDeal;
     private LinearLayout shop_cart;
     private RecyclerView shopCartRecyclerView;
@@ -78,72 +70,18 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
-        //半透明状态栏
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-
         //初始化控件
         initControlUnit();
+        //初始化显示界面
+        initView();
+        //初始化点击事件
+        initClick();
 
-        //设置显示界面
-        {
-            //设置自定义标题栏
-            toolbar.setTitle("所有上架商品");
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-            //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
-            user = (User) getIntent().getSerializableExtra("user_data");
-            phoneText.setText(user.getMobilePhoneNumber());
-            nickName.setText(user.getUserNickName());
-
-            //滑动菜单默认选中子项
-            navView.setCheckedItem(R.id.goods_onSale);
-
-            //显示当前所有上架商品
-            refreshGoods(goods_recyclerView);//刷新商品界面
-            GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-            goods_recyclerView.setLayoutManager(layoutManager);
-
-            //设置下拉刷新时，刷新等待圈颜色
-            swipeRefresh.setColorSchemeResources(R.color.design_default_color_primary);
-        }
-
-        //设置点击事件
-        {
-            quitBtn.setOnClickListener(this);//滑动菜单的右上角，有个垃圾箱标志，退出登录功能
-            goToDeal.setOnClickListener(this);//去结算点击事件
-            shop_cart.setOnClickListener(this);//购物车栏点击事件
-            cleanShopCart.setOnClickListener(this);//清空购物车
-
-            //设置滑动菜单的点击事件
-            navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int id = item.getItemId();
-                    if (id == R.id.goods_onSale)
-                        drawerLayout.closeDrawers();//默认购物界面为主界面，所以关闭就好
-                    else if (id == R.id.goods_manage) {
-                        Intent intent = new Intent(AdminMainActivity.this, GoodsManageActivity.class);
-                        if (user.getAdmin() > 0) {
-                            startActivity(intent);
-                        }
-                    } else {
-                        drawerLayout.closeDrawers();
-                        Toast.makeText(AdminMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();
-                    }
-                    return true;
-                }
-            });
-        }
-
-
-        //save();//测试用
         //设置下拉刷新显示商品界面
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshGoods(goods_recyclerView);
+                refresh(goods_recyclerView);
             }
         });
     }
@@ -165,6 +103,105 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
         shopCartRecyclerView = findViewById(R.id.shopCartRecyclerView);
         shopCartView = findViewById(R.id.shopCartView);
         cleanShopCart = findViewById(R.id.cleanShopCart);
+    }
+
+    //初始化显示界面
+    private void initView() {
+        //半透明状态栏
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        //设置自定义标题栏
+        toolbar.setTitle("所有上架商品");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
+        user = (User) getIntent().getSerializableExtra("user_data");
+        phoneText.setText(user.getMobilePhoneNumber());
+        nickName.setText(user.getUserNickName());
+
+        //滑动菜单默认选中子项
+        navView.setCheckedItem(R.id.goods_onSale);
+
+        //显示当前所有上架商品
+        refresh(goods_recyclerView);//刷新商品界面
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        goods_recyclerView.setLayoutManager(layoutManager);
+
+        //设置下拉刷新时，刷新等待圈颜色
+        swipeRefresh.setColorSchemeResources(R.color.design_default_color_primary);
+    }
+
+    //初始化点击事件
+    private void initClick() {
+        quitBtn.setOnClickListener(this);//滑动菜单的右上角，有个垃圾箱标志，退出登录功能
+        goToDeal.setOnClickListener(this);//去结算点击事件
+        shop_cart.setOnClickListener(this);//购物车栏点击事件
+        cleanShopCart.setOnClickListener(this);//清空购物车
+
+        //设置滑动菜单的点击事件
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.goods_onSale)
+                    drawerLayout.closeDrawers();//默认购物界面为主界面，所以关闭就好
+                else if (id == R.id.goods_manage) {
+                    Intent intent = new Intent(AdminMainActivity.this, GoodsManageActivity.class);
+                    if (user.getAdmin() > 0) {
+                        startActivity(intent);
+                    }
+                } else {
+                    drawerLayout.closeDrawers();
+                    Toast.makeText(AdminMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();
+                }
+                closeShopCarListView();
+                return true;
+            }
+        });
+    }
+
+    //刷新当前显示的商品
+    private void refresh(RecyclerView recyclerView) {
+        List<Goods> goodsList = new ArrayList<>();
+        BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
+        query.setLimit(500).order("-createdAt").addWhereNotEqualTo("goodsState", 1).findObjects(new FindListener<Goods>() {
+            @Override
+            public void done(List<Goods> object, BmobException e) {
+                if (e == null) {
+                    goodsList.addAll(object);//将获取的商品添加到列表
+                    GoodsAdapter adapter = new GoodsAdapter(AdminMainActivity.this, goodsList, user);//所有商品添加到适配器
+                    goods_recyclerView.setAdapter(adapter);//为recyclerView设置适配器
+
+                    //每次刷新商品时，同时刷新购物车中的商品数据，防止数据显示不统一的bug
+                    for (Goods goods : goodsList) {
+                        if (HeySweetieApplication.shopCartMap.containsKey(goods)) {
+                            //由于重写了equal()和hashcode方法，所以即使goods信息已经改变，也会匹配上
+                            int count = HeySweetieApplication.shopCartMap.get(goods);//获取之前的数量
+                            HeySweetieApplication.shopCartMap.remove(goods);//删除key
+                            HeySweetieApplication.shopCartMap.put(goods, count);//放入新的key
+                        }
+                    }
+                    //解决当某个商品已经下架了，仍然有在购物车的bug
+                    Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
+                    for (Goods key : keys) {//遍历购物车
+                        for (Goods goods : goodsList) {//遍历所有未下架商品
+                            if (key.equals(goods)) break;
+                            if (goods.equals(goodsList.get(goodsList.size() - 1))) {//说明到末尾了
+                                if (!key.equals(goods)) {//此时还没找到，说明这个商品下架了，那么从购物车里把它清除掉
+                                    HeySweetieApplication.shopCartMap.remove(key);
+                                }
+                            }
+                        }
+                    }
+                    refreshShopCar();
+                    //结束刷新
+                    swipeRefresh.setRefreshing(false);
+                } else {
+                }
+            }
+        });
+
     }
 
     //刷新购物栏
@@ -190,39 +227,12 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
 
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        refreshShopCar();//每次重新获取到显示界面，刷新购物车栏
-    }
-
-    //刷新当前显示的商品
-    private void refreshGoods(RecyclerView recyclerView) {
-        List<Goods> goodsList = new ArrayList<>();
-        BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
-        query.setLimit(500).setSkip(1).order("-createdAt").addWhereNotEqualTo("goodsState", 2).findObjects(new FindListener<Goods>() {
-            @Override
-            public void done(List<Goods> object, BmobException e) {
-                if (e == null) {
-                    goodsList.addAll(object);//将获取的商品添加到列表
-                    GoodsAdapter adapter = new GoodsAdapter(AdminMainActivity.this, goodsList);//所有商品添加到适配器
-                    goods_recyclerView.setAdapter(adapter);//为recyclerView设置适配器
-
-                    //每次刷新商品时，同时刷新购物车中的商品数据，防止数据显示不统一的bug
-                    for (Goods goods : goodsList) {
-                        if (HeySweetieApplication.shopCartMap.containsKey(goods)) {
-                            //由于重写了equal()和hashcode方法，所以即使goods信息已经改变，也会匹配上
-                            int count = HeySweetieApplication.shopCartMap.get(goods);//获取之前的数量
-                            HeySweetieApplication.shopCartMap.remove(goods);//删除key
-                            HeySweetieApplication.shopCartMap.put(goods, count);//放入新的key
-                        }
-                    }
-                    //结束刷新
-                    swipeRefresh.setRefreshing(false);
-                } else {
-                }
-            }
-        });
-
+    protected void onResume() {
+        //滑动菜单默认选中子项
+        navView.setCheckedItem(R.id.goods_onSale);
+        refresh(goods_recyclerView);//每次重新获取到显示界面，刷新购物车栏
+        super.onResume();
+        //Toast.makeText(this, "Resume activate", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -237,6 +247,8 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
         } else if (getId == R.id.goToDeal) {//去结算去
             Toast.makeText(AdminMainActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
             HeySweetieApplication.shopCartMap.clear();
+            closeShopCarListView();
+            refreshShopCar();
         } else if (getId == R.id.shop_cart) {
             if (shopCartView.getVisibility() == View.GONE) {//显示购物车详细信息
                 //设置可见性 这样设置显示是为了处理count数据不同步可能产生的bug
@@ -247,6 +259,8 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
                 for (Goods key : keys) {
                     if (HeySweetieApplication.shopCartMap.get(key) > 0) {
                         goodsList.add(key);//获取所有数量大于0的商品
+                    } else {
+                        HeySweetieApplication.shopCartMap.remove(key);//清除所有数量为0的商品
                     }
                 }
                 ShopCartGoodsAdapter adapter = new ShopCartGoodsAdapter(AdminMainActivity.this, goodsList);//所有商品添加到适配器
@@ -260,8 +274,8 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
         } else if (getId == R.id.cleanShopCart) {//清空购物车
             HeySweetieApplication.shopCartMap.clear();
             closeShopCarListView();
+            refreshShopCar();
         }
-        refreshShopCar();
     }
 
     //关闭购物车详细信息
@@ -276,67 +290,5 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             drawerLayout.openDrawer(GravityCompat.START);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void save() {
-        List<BmobObject> goodses = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            Goods goods1 = new Goods();
-            goods1.setGoodsName("苹果汁");
-            goods1.setImageId(R.drawable.apple);
-            Goods goods2 = new Goods();
-            goods2.setGoodsName("梨汁");
-            goods2.setImageId(R.drawable.pear);
-            Goods goods3 = new Goods();
-            goods3.setGoodsName("香蕉牛奶");
-            goods3.setImageId(R.drawable.banana);
-            Goods goods4 = new Goods();
-            goods4.setGoodsName("樱桃汁");
-            goods4.setImageId(R.drawable.cherry);
-            Goods goods5 = new Goods();
-            goods5.setGoodsName("葡萄汁");
-            goods5.setImageId(R.drawable.grape);
-            Goods goods6 = new Goods();
-            goods6.setGoodsName("芒果汁");
-            goods6.setImageId(R.drawable.mango);
-            Goods goods7 = new Goods();
-            goods7.setGoodsName("橙汁");
-            goods7.setImageId(R.drawable.orange);
-            Goods goods8 = new Goods();
-            goods8.setGoodsName("凤梨汁");
-            goods8.setImageId(R.drawable.pineapple);
-            Goods goods9 = new Goods();
-            goods9.setGoodsName("草莓汁");
-            goods9.setImageId(R.drawable.strawberry);
-
-            goodses.add(goods1);
-            goodses.add(goods2);
-            goodses.add(goods3);
-            goodses.add(goods4);
-            goodses.add(goods5);
-            goodses.add(goods6);
-            goodses.add(goods7);
-            goodses.add(goods8);
-            goodses.add(goods9);
-        }
-        new BmobBatch().insertBatch(goodses).doBatch(new QueryListListener<BatchResult>() {
-            @Override
-            public void done(List<BatchResult> results, BmobException e) {
-                if (e == null) {
-                    for (int i = 0; i < results.size(); i++) {
-                        BatchResult result = results.get(i);
-                        BmobException ex = result.getError();
-                        if (ex == null) {
-                            Snackbar.make(goods_recyclerView, "第" + i + "个数据批量添加成功：" + result.getCreatedAt() + "," + result.getObjectId() + "," + result.getUpdatedAt(), Snackbar.LENGTH_LONG).show();
-                        } else {
-                            Snackbar.make(goods_recyclerView, "第" + i + "个数据批量添加失败：" + ex.getMessage() + "," + ex.getErrorCode(), Snackbar.LENGTH_LONG).show();
-
-                        }
-                    }
-                } else {
-                    Snackbar.make(goods_recyclerView, "失败：" + e.getMessage() + "," + e.getErrorCode(), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 }

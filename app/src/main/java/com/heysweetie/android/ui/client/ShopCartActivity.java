@@ -11,12 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.card.MaterialCardView;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.ShopCartGoodsAdapter;
+import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +23,7 @@ import java.util.Set;
 
 public class ShopCartActivity extends AppCompatActivity implements View.OnClickListener {
     private User user;
+
     private RecyclerView shopCartRecyclerView;
     private TextView cleanShopCart;
     private static TextView shopCartTotalPrice;
@@ -75,6 +75,8 @@ public class ShopCartActivity extends AppCompatActivity implements View.OnClickL
         for (Goods key : keys) {
             if (HeySweetieApplication.shopCartMap.get(key) > 0) {
                 goodsList.add(key);//获取所有数量大于0的商品
+            } else {
+                HeySweetieApplication.shopCartMap.remove(key);//清除所有数量为0的商品
             }
         }
         ShopCartGoodsAdapter adapter = new ShopCartGoodsAdapter(ShopCartActivity.this, goodsList);//所有商品添加到适配器
@@ -118,7 +120,7 @@ public class ShopCartActivity extends AppCompatActivity implements View.OnClickL
             HeySweetieApplication.shopCartMap.clear();
             initShopCart();
             refreshShopCar();
-        }else if (id == R.id.back){
+        } else if (id == R.id.back) {
             finish();
         }
     }

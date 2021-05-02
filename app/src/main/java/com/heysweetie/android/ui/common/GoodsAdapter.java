@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui;
+package com.heysweetie.android.ui.common;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,28 +8,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.heysweetie.android.MainActivity;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.logic.model.User;
 import com.heysweetie.android.ui.admin.AdminMainActivity;
 import com.heysweetie.android.ui.client.ClientMainActivity;
-import com.heysweetie.android.ui.client.GoodsDetailActivity;
 
 import java.util.List;
 
 public class GoodsAdapter extends RecyclerView.Adapter<GoodsAdapter.ViewHolder> {
     private List<Goods> goodsList;
     private Context context;
+    private User user;
 
-    public GoodsAdapter(Context context, List<Goods> goodsList) {
+    public GoodsAdapter(Context context, List<Goods> goodsList, User user) {
         this.context = context;
         this.goodsList = goodsList;
+        this.user = user;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -56,13 +56,15 @@ public class GoodsAdapter extends RecyclerView.Adapter<GoodsAdapter.ViewHolder> 
                 Goods goods = goodsList.get(position);
                 Intent intent = new Intent(context, GoodsDetailActivity.class);
                 intent.putExtra("goods_data", goods);
+                intent.putExtra("user_data", user);
                 context.startActivity(intent);
+
                 if (context.getClass() == GoodsDetailActivity.class)//已经在商品详情页，关闭当前页，
                     ((GoodsDetailActivity) context).finish();
                 //关闭当前页面的购物车详细信息
                 if ((Activity) context instanceof GoodsDetailActivity)
                     GoodsDetailActivity.closeShopCarListView();
-                if ((Activity) context instanceof MainActivity)
+                if ((Activity) context instanceof AdminMainActivity)
                     AdminMainActivity.closeShopCarListView();
                 if ((Activity) context instanceof ClientMainActivity) {
                     ClientMainActivity.closeShopCarListView();
