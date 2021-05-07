@@ -23,6 +23,7 @@ import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.User;
 import com.heysweetie.android.ui.admin.AdminMainActivity;
 import com.heysweetie.android.ui.client.ClientMainActivity;
+import com.heysweetie.android.ui.common.BaseActivity;
 
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private EditText accountEdit;
     private EditText passwordEdit;
     private Button loginBtn;
@@ -158,7 +159,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         user.setMobilePhoneNumber(phone);//设置手机号码（必填）
         user.setUsername(phone);//设置用户名（登录账号）默认为手机号码
         user.setPassword(password);//设置用户密码
+        user.setUserPassword(password);
         user.setUserNickName("HeySweetie新用户");//默认的名字
+        user.setUserImageId(R.drawable.headshot_1);//默认头像
         user.setAdmin(0);//该界面注册的默认为新用户
 
         user.signOrLogin(code, new SaveListener<User>() {
@@ -236,7 +239,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         );
     }
 
-    private boolean isValidPassword(String str) {
+    public static boolean isValidPassword(String str) {
         //密码的正则规则 6到20位  包含数字 字母 特殊字符!@.,()
         return str.matches("^[\\w!@#$%^&*`~()-+=]{6,20}$");
     }
@@ -250,8 +253,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void login(View v) { //登录功能
-        //调整登录按钮
-        loginBtn.setEnabled(false);
+        loginBtn.setEnabled(false);//调整登录按钮
         progressBar.setVisibility(View.VISIBLE);
 
         final User user = new User();
@@ -261,7 +263,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void done(User bmobUser, BmobException e) {
                 if (e == null) {
-                    User user = BmobUser.getCurrentUser(User.class);
+                    User user = bmobUser;
                     Intent intent;
                     if (user.getAdmin() == 0) {
                         intent = new Intent(LoginActivity.this, ClientMainActivity.class);

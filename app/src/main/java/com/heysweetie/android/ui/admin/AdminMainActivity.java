@@ -1,7 +1,6 @@
 package com.heysweetie.android.ui.admin;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,10 +17,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.navigation.NavigationView;
@@ -29,12 +30,15 @@ import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 
+import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
+import com.heysweetie.android.ui.common.BaseActivity;
 import com.heysweetie.android.ui.common.GoodsAdapter;
 import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 import com.heysweetie.android.ui.login.LoginActivity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -42,9 +46,10 @@ import cn.bmob.v3.BmobQuery;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
 
 
-public class AdminMainActivity extends AppCompatActivity implements View.OnClickListener {
+public class AdminMainActivity extends BaseActivity implements View.OnClickListener {
 
     private User user;
     //滑动菜单组件
@@ -53,6 +58,7 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
     private TextView phoneText;
     private TextView nickName;
     private Button quitBtn;
+    private ImageView headShot_Image;
 
     //主界面组件
     private SwipeRefreshLayout swipeRefresh;
@@ -93,6 +99,7 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
         phoneText = (TextView) navView.getHeaderView(0).findViewById(R.id.phoneText);//获取navView的header!!!!
         nickName = (TextView) navView.getHeaderView(0).findViewById(R.id.nickNameText);
         quitBtn = (Button) navView.getHeaderView(0).findViewById(R.id.quitBtn);
+        headShot_Image = navView.getHeaderView(0).findViewById(R.id.headShot_Image);
         toolbar = findViewById(R.id.toolBar);
         goods_recyclerView = findViewById(R.id.goods_recyclerView);
         swipeRefresh = findViewById(R.id.swipeRefresh);
@@ -117,9 +124,9 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
 
         //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
         user = (User) getIntent().getSerializableExtra("user_data");
-        phoneText.setText(user.getMobilePhoneNumber());
+        Glide.with(navView).load(user.getUserImageId()).into(headShot_Image);
+        phoneText.setText(user.getAdmin() == 1 ? "普通管理员" : "超级管理员");
         nickName.setText(user.getUserNickName());
-
         //滑动菜单默认选中子项
         navView.setCheckedItem(R.id.goods_onSale);
 
@@ -148,7 +155,17 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
                     drawerLayout.closeDrawers();//默认购物界面为主界面，所以关闭就好
                 else if (id == R.id.goods_manage) {
                     Intent intent = new Intent(AdminMainActivity.this, GoodsManageActivity.class);
+                    if (user.getAdmin() > 1) {//超级管理员才可以打开
+                        startActivity(intent);
+                    }
+                } else if (id == R.id.order_manage) {
+                    Intent intent = new Intent(AdminMainActivity.this, OrderManageActivity.class);
                     if (user.getAdmin() > 0) {
+                        startActivity(intent);
+                    }
+                } else if (id == R.id.admin_manage) {
+                    Intent intent = new Intent(AdminMainActivity.this, AdminManageActivity.class);
+                    if (user.getAdmin() > 1) {//超级管理员才可以打开
                         startActivity(intent);
                     }
                 } else {
@@ -245,10 +262,7 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         } else if (getId == R.id.goToDeal) {//去结算去
-            Toast.makeText(AdminMainActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
-            HeySweetieApplication.shopCartMap.clear();
-            closeShopCarListView();
-            refreshShopCar();
+            goToDeal();
         } else if (getId == R.id.shop_cart) {
             if (shopCartView.getVisibility() == View.GONE) {//显示购物车详细信息
                 //设置可见性 这样设置显示是为了处理count数据不同步可能产生的bug
@@ -275,6 +289,40 @@ public class AdminMainActivity extends AppCompatActivity implements View.OnClick
             HeySweetieApplication.shopCartMap.clear();
             closeShopCarListView();
             refreshShopCar();
+        }
+    }
+
+    private void goToDeal() {
+        GoodsOrder goodsOrder = new GoodsOrder();
+        goodsOrder.setUsername(user.getUsername());
+        //获取购物车所有的商品,添加到订单
+        List<Goods> goodsList = new ArrayList<>();
+        List<Integer> countList = new ArrayList<>();
+        Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
+        for (Goods key : keys) {
+            int count = HeySweetieApplication.shopCartMap.get(key);
+            if (count > 0) {//将购物车中数量大于一商品的添加list
+                goodsList.add(key);
+                countList.add(count);
+            }
+        }
+        if (goodsList.size() > 0) {
+            goodsOrder.setGoodsList(goodsList);
+            goodsOrder.setCountList(countList);
+            goodsOrder.setOrderDate(new Date());
+            goodsOrder.save(new SaveListener<String>() {
+                @Override
+                public void done(String objectId, BmobException e) {
+                    if (e == null) {
+                        HeySweetieApplication.shopCartMap.clear();
+                        refreshShopCar();
+                        closeShopCarListView();
+                        Toast.makeText(AdminMainActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(AdminMainActivity.this, "结算失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 

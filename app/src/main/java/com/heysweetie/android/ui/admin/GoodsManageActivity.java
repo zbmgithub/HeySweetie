@@ -1,7 +1,6 @@
 package com.heysweetie.android.ui.admin;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -12,11 +11,11 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.ui.common.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 
-public class GoodsManageActivity extends AppCompatActivity {
+public class GoodsManageActivity extends BaseActivity {
     private MaterialToolbar toolbar;
     private static RecyclerView allGoods_RecycleView;
     private SwipeRefreshLayout swipeRefresh;
@@ -90,7 +89,6 @@ public class GoodsManageActivity extends AppCompatActivity {
                     goodsList.addAll(object);//将获取的商品添加到列表
                     GoodsManageAdapter adapter = new GoodsManageAdapter(GoodsManageActivity.this, goodsList);//所有商品添加到适配器
                     allGoods_RecycleView.setAdapter(adapter);//为recyclerView设置适配器
-                    Toast.makeText(GoodsManageActivity.this, "刷新中", Toast.LENGTH_SHORT).show();
                     //结束刷新
                     swipeRefresh.setRefreshing(false);
                 } else {
@@ -102,7 +100,6 @@ public class GoodsManageActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Toast.makeText(this, "Resume Activate", Toast.LENGTH_SHORT).show();
         refreshGoods(allGoods_RecycleView);
         super.onResume();
     }

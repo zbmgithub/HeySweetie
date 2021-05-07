@@ -16,8 +16,8 @@ public class User extends BmobUser implements Serializable {
 
     private String userNickName;//用户昵称
     private int admin;//0代表普通用户，1代表普通后台管理，2代表超级管理员
-    private String userImage;//用户头像
-
+    private int userImageId;//用户头像
+    private String userPassword;//用户密码
 
     public int getAdmin() {
         return admin;
@@ -27,13 +27,6 @@ public class User extends BmobUser implements Serializable {
         this.admin = admin;
     }
 
-    public String getUserImage() {
-        return userImage;
-    }
-
-    public void setUserImage(String userImage) {
-        this.userImage = userImage;
-    }
 
     public String getUserNickName() {
         return userNickName;
@@ -41,5 +34,21 @@ public class User extends BmobUser implements Serializable {
 
     public void setUserNickName(String userNickName) {
         this.userNickName = userNickName;
+    }
+
+    public int getUserImageId() {
+        return userImageId;
+    }
+
+    public void setUserImageId(int userImageId) {
+        this.userImageId = userImageId;
+    }
+
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
     }
 }

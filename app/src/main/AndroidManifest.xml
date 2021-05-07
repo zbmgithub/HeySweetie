@@ -18,7 +18,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HeySweetie">
-        <activity android:name=".ui.admin.GoodsManageDetailActivity"></activity>
+        <activity android:name=".ui.client.ClientInfoManageActivity"></activity>
+        <activity android:name=".ui.admin.AdminManageDetailActivity" />
+        <activity android:name=".ui.admin.AdminManageActivity" />
+        <activity android:name=".ui.admin.OrderManageActivity" />
+        <activity android:name=".ui.client.ClientGoodsOrderActivity" />
+        <activity android:name=".ui.admin.GoodsManageDetailActivity" />
         <activity android:name=".ui.client.ShopCartActivity" />
         <activity android:name=".ui.common.GoodsDetailActivity" />
         <activity android:name=".ui.admin.GoodsManageActivity" />

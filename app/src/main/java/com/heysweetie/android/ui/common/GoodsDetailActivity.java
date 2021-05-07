@@ -1,7 +1,6 @@
 package com.heysweetie.android.ui.common;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,18 +22,21 @@ import com.google.android.material.card.MaterialCardView;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.admin.AdminMainActivity;
+
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
 
-public class GoodsDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class GoodsDetailActivity extends BaseActivity implements View.OnClickListener {
     private static Goods goods;
     private User user;
 
@@ -64,7 +66,7 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         //获取传递过来的对象
         Intent intent = getIntent();
         goods = (Goods) intent.getSerializableExtra("goods_data");
-        user = (User) intent.getParcelableExtra("user_data");
+        user = (User) intent.getSerializableExtra("user_data");
 
         //初始化控件
         initControlUnit();
@@ -190,12 +192,9 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
             HeySweetieApplication.shopCartMap.put(goods, count);
             countText.setText(count + "");
         } else if (id == R.id.goToDeal) {//去结算
-            Toast.makeText(GoodsDetailActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
             addCountBtn.setEnabled(true);//这样设置显示是为了处理某些数据不同步可能产生的bug
             minusCountBtn.setEnabled(true);
-            countText.setText("0");
-            HeySweetieApplication.shopCartMap.clear();
-            closeShopCarListView();
+            goToDeal();
         } else if (id == R.id.shop_cart) {//点击购物车
             if (shopCartView.getVisibility() == View.GONE) {//显示购物车详细信息
                 //设置可见性
@@ -230,6 +229,40 @@ public class GoodsDetailActivity extends AppCompatActivity implements View.OnCli
         }
 
         refreshShopCar();//每次点击事件后都刷新一次购物车栏，实现动态变化
+    }
+
+    private void goToDeal() {
+        GoodsOrder goodsOrder = new GoodsOrder();
+        goodsOrder.setUsername(user.getUsername());
+        //获取购物车所有的商品,添加到订单
+        List<Goods> goodsList = new ArrayList<>();
+        List<Integer> countList = new ArrayList<>();
+        Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
+        for (Goods key : keys) {
+            int count = HeySweetieApplication.shopCartMap.get(key);
+            if (count > 0) {//将购物车中数量大于一商品的添加list
+                goodsList.add(key);
+                countList.add(count);
+            }
+        }
+        if (goodsList.size() > 0) {
+            goodsOrder.setGoodsList(goodsList);
+            goodsOrder.setCountList(countList);
+            goodsOrder.setOrderDate(new Date());
+            goodsOrder.save(new SaveListener<String>() {
+                @Override
+                public void done(String objectId, BmobException e) {
+                    if (e == null) {
+                        HeySweetieApplication.shopCartMap.clear();
+                        refreshShopCar();
+                        closeShopCarListView();
+                        Toast.makeText(GoodsDetailActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(GoodsDetailActivity.this, "结算失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     //刷新购物栏（最下方一行）

@@ -1,6 +1,5 @@
 package com.heysweetie.android.ui.client;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,14 +13,20 @@ import android.widget.Toast;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
+import com.heysweetie.android.ui.common.BaseActivity;
 import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public class ShopCartActivity extends AppCompatActivity implements View.OnClickListener {
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
+
+public class ShopCartActivity extends BaseActivity implements View.OnClickListener {
     private User user;
 
     private RecyclerView shopCartRecyclerView;
@@ -116,12 +121,43 @@ public class ShopCartActivity extends AppCompatActivity implements View.OnClickL
             initShopCart();
             refreshShopCar();
         } else if (id == R.id.goToDeal) {//去结算去
-            Toast.makeText(ShopCartActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
-            HeySweetieApplication.shopCartMap.clear();
-            initShopCart();
-            refreshShopCar();
+            goToDeal();
         } else if (id == R.id.back) {
             finish();
+        }
+    }
+
+    private void goToDeal() {
+        GoodsOrder goodsOrder = new GoodsOrder();
+        goodsOrder.setUsername(user.getUsername());
+        //获取购物车所有的商品,添加到订单
+        List<Goods> goodsList = new ArrayList<>();
+        List<Integer> countList = new ArrayList<>();
+        Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
+        for (Goods key : keys) {
+            int count = HeySweetieApplication.shopCartMap.get(key);
+            if (count > 0) {//将购物车中数量大于一商品的添加list
+                goodsList.add(key);
+                countList.add(count);
+            }
+        }
+        if (goodsList.size() > 0) {
+            goodsOrder.setGoodsList(goodsList);
+            goodsOrder.setCountList(countList);
+            goodsOrder.setOrderDate(new Date());
+            goodsOrder.save(new SaveListener<String>() {
+                @Override
+                public void done(String objectId, BmobException e) {
+                    if (e == null) {
+                        HeySweetieApplication.shopCartMap.clear();
+                        initShopCart();
+                        refreshShopCar();
+                        Toast.makeText(ShopCartActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ShopCartActivity.this, "结算失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 }

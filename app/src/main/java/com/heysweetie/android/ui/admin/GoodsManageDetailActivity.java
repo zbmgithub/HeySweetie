@@ -1,7 +1,6 @@
 package com.heysweetie.android.ui.admin;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +21,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
+import com.heysweetie.android.ui.common.BaseActivity;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
@@ -30,7 +30,7 @@ import cn.bmob.v3.listener.UpdateListener;
 import static java.lang.Thread.sleep;
 
 
-public class GoodsManageDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class GoodsManageDetailActivity extends BaseActivity implements View.OnClickListener {
     private static Goods goods;
     private boolean add_new_goods_flag;
 
