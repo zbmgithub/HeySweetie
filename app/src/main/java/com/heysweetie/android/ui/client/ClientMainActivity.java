@@ -30,6 +30,7 @@ import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
 import com.heysweetie.android.ui.common.BaseActivity;
 import com.heysweetie.android.ui.common.GoodsAdapter;
+import com.heysweetie.android.ui.common.MemosActivity;
 import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 import com.heysweetie.android.ui.login.LoginActivity;
 
@@ -154,6 +155,11 @@ public class ClientMainActivity extends BaseActivity implements View.OnClickList
                     Intent intent = new Intent(ClientMainActivity.this, ClientInfoManageActivity.class);
                     intent.putExtra("user_data", user);
                     startActivity(intent);//跳转到个人信息界面，
+                } else if (item.getItemId() == R.id.memos) {
+                    Intent intent = new Intent(ClientMainActivity.this, MemosActivity.class);
+                    intent.putExtra("user_data", user);
+                    intent.putExtra("user_phone", user.getMobilePhoneNumber());
+                    startActivity(intent);//跳转到留言界面
                 } else {
                     drawerLayout.closeDrawers();
                     Toast.makeText(ClientMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();

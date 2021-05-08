@@ -168,6 +168,12 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
                     if (user.getAdmin() > 1) {//超级管理员才可以打开
                         startActivity(intent);
                     }
+                } else if (id == R.id.msg_manage) {
+                    Intent intent = new Intent(AdminMainActivity.this, MsgManageActivity.class);
+                    if (user.getAdmin() > 0) {
+                        intent.putExtra("user_data", user);
+                        startActivity(intent);
+                    }
                 } else {
                     drawerLayout.closeDrawers();
                     Toast.makeText(AdminMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();

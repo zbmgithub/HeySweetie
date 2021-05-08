@@ -18,8 +18,8 @@
             android:icon="@drawable/ic_heysweetie"
             android:title="购物车" />
         <item
-            android:id="@+id/human_service"
+            android:id="@+id/memos"
             android:icon="@drawable/ic_comment"
-            android:title="人工客服" />
+            android:title="留言" />
     </group>
 </menu>
