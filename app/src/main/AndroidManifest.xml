@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HeySweetie">
-        <activity android:name=".ui.admin.MsgManageActivity"></activity>
+        <activity android:name=".ui.admin.StatisticActivity"></activity>
+        <activity android:name=".ui.admin.MsgManageActivity" />
         <activity android:name=".ui.common.MemosActivity" />
         <activity android:name=".ui.client.ClientInfoManageActivity" />
         <activity android:name=".ui.admin.AdminManageDetailActivity" />

@@ -174,6 +174,11 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
                         intent.putExtra("user_data", user);
                         startActivity(intent);
                     }
+                } else if (id == R.id.statistic) {
+                    Intent intent = new Intent(AdminMainActivity.this, StatisticActivity.class);
+                    if (user.getAdmin() > 1) {
+                        startActivity(intent);
+                    }
                 } else {
                     drawerLayout.closeDrawers();
                     Toast.makeText(AdminMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();

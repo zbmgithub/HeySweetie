@@ -25,10 +25,6 @@
             android:id="@+id/msg_manage"
             android:icon="@drawable/ic_comment"
             android:title="留言管理" />
-        <item
-            android:id="@+id/repository_manage"
-            android:icon="@drawable/ic_menu"
-            android:title="库存管理" />
 
     </group>
 </menu>

@@ -8,7 +8,7 @@ import java.util.Date;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 
-public class Goods extends BmobObject implements Serializable {
+public class Goods extends BmobObject implements Serializable, Comparable<Goods> {
     //父类默认有唯一标志 String objectId; 作为商品编号
     private int goodsState = 0;//商品状态 0代表上架不折扣，1代表上架折扣，2代表下架
     private String goodsSortName = "";//商品类别
@@ -127,5 +127,8 @@ public class Goods extends BmobObject implements Serializable {
         return getObjectId().hashCode();
     }
 
-
+    @Override
+    public int compareTo(Goods o) {
+        return getObjectId().compareTo(o.getObjectId());
+    }
 }
