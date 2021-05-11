@@ -61,7 +61,7 @@ public class MsgManageActivity extends AppCompatActivity {
 
     private void refresh() {
         BmobQuery<Msg> query = new BmobQuery<>();
-        query.order("-msgDate").findObjects(new FindListener<Msg>() {
+        query.order("-updatedAt").findObjects(new FindListener<Msg>() {
             @Override
             public void done(List<Msg> msgs, BmobException e) {
                 if (e == null) {
