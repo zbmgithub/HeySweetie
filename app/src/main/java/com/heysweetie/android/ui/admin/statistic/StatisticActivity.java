@@ -147,6 +147,7 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
         } else if (flag == 2) {
             dateEnd = calendar.get(Calendar.YEAR) + "-12-31 23:59:59";
         } else {
+            calendar = Calendar.getInstance();
             dateEnd = "" + calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1)
                     + "-" + calendar.get(Calendar.DAY_OF_MONTH) + " 23:59:59";
         }
@@ -164,7 +165,7 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
         } else if (flag == 2) {
             dateBegin = calendar.get(Calendar.YEAR) + "-1-1 00:00:00";
         } else {
-            dateBegin = "1970-1-1 00:00:00";
+            dateBegin = "1970-1-1 00:00:01";
         }
         return dateBegin;
     }
@@ -238,6 +239,7 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
                     goodsSaleCount_recycler.setAdapter(new StatisticAdapter(StatisticActivity.this, goodsList, countList, goodsPriceSale));
                     totalPrice_Text.setText("总销售额￥" + Double.parseDouble(String.format("%.2f", totalPrice)));
                     totalCount_Text.setText("总销量 " + totalCount);
+
                 } else {
                     Toast.makeText(StatisticActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                 }
