@@ -9,15 +9,14 @@
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="5dp">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="5dp"
             android:backgroundTint="#dedede"
             app:cardCornerRadius="15dp">
 

@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.goodsmanage;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,7 +41,7 @@ public class GoodsManageActivity extends BaseActivity {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshGoods(allGoods_RecycleView);
+                refreshGoods();
             }
         });
         addNewGoods_TextView.setOnClickListener(new View.OnClickListener() {
@@ -71,24 +71,23 @@ public class GoodsManageActivity extends BaseActivity {
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        //显示当前所有上架商品
-        refreshGoods(allGoods_RecycleView);//刷新商品界面
+        //显示当前所有商品
+        refreshGoods();//刷新商品界面
         allGoods_RecycleView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         swipeRefresh.setColorSchemeResources(R.color.purple_500);
     }
 
     //刷新当前显示的商品
-    private void refreshGoods(RecyclerView recyclerView) {
+    private void refreshGoods() {
         List<Goods> goodsList = new ArrayList<>();
         BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
-        query.setLimit(500).order("-createdAt").findObjects(new FindListener<Goods>() {
+        query.order("-createdAt").findObjects(new FindListener<Goods>() {
             @Override
             public void done(List<Goods> object, BmobException e) {
                 if (e == null) {
                     goodsList.addAll(object);//将获取的商品添加到列表
-                    GoodsManageAdapter adapter = new GoodsManageAdapter(GoodsManageActivity.this, goodsList);//所有商品添加到适配器
-                    allGoods_RecycleView.setAdapter(adapter);//为recyclerView设置适配器
+                    allGoods_RecycleView.setAdapter(new GoodsManageAdapter(GoodsManageActivity.this, goodsList));
                     //结束刷新
                     swipeRefresh.setRefreshing(false);
                 } else {
@@ -100,7 +99,7 @@ public class GoodsManageActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
-        refreshGoods(allGoods_RecycleView);
+        refreshGoods();
         super.onResume();
     }
 

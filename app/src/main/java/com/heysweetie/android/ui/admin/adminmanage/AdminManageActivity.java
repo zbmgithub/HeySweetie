@@ -1,5 +1,6 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.adminmanage;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -7,6 +8,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -62,6 +64,7 @@ public class AdminManageActivity extends BaseActivity {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         toolbar.setTitle("系统用户管理");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         allAdmin_RecycleView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         refresh();
     }
@@ -94,5 +97,12 @@ public class AdminManageActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         refresh();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -183,8 +183,7 @@ public class ClientMainActivity extends BaseActivity implements View.OnClickList
             price += key.getPrice() * key.getSale() * tempCount;
         }
         //设置为两位小数
-        double priceOutput = Double.parseDouble(String.format("%.2f", price));
-        shopCartTotalPrice.setText(priceOutput + "");
+        shopCartTotalPrice.setText(Double.parseDouble(String.format("%.2f", price)) + "");
 
         //设置购物车数量显示
         shopCartTotalCount.setText(count + "");

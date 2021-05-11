@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.statistic;
 
 import android.content.Context;
 import android.view.LayoutInflater;

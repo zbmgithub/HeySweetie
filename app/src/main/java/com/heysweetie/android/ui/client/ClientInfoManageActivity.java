@@ -1,5 +1,6 @@
 package com.heysweetie.android.ui.client;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,7 +20,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.admin.AdminManageDetailActivity;
 import com.heysweetie.android.ui.common.ActivityCollector;
 import com.heysweetie.android.ui.common.BaseActivity;
 import com.heysweetie.android.ui.common.HeadShotsAdapter;
@@ -101,6 +102,7 @@ public class ClientInfoManageActivity extends BaseActivity {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         toolBar.setTitle("个人信息");
         setSupportActionBar(toolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Glide.with(ClientInfoManageActivity.this).load(user.getUserImageId()).into(headShot_Image);
         userImageId = user.getUserImageId();
         loginAccount.setText(user.getUsername());
@@ -125,5 +127,12 @@ public class ClientInfoManageActivity extends BaseActivity {
         user.setUserImageId(imageId);
         Glide.with(context).load(imageId).into(headShot_Image);
         userImageId = imageId;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 }

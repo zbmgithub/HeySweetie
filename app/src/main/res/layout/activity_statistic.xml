@@ -14,6 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#D8BFD8"
         android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
         app:titleTextColor="@color/white" />
 
 
@@ -65,25 +66,41 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
+                    android:layout_gravity="center"
                     android:gravity="center|right"
-                    android:text="平均售价" />
+                    android:text="平均单价" />
 
-                <TextView
-                    android:id="@+id/totalInfo"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:gravity="center|right"
-                    android:text="总销售额￥0.00  总销量 0"
-                    android:textColor="#FF1493" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/totalPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center|right"
+                        android:text="总销售额￥0.00"
+                        android:textColor="#FF1493" />
+                    <TextView
+                        android:id="@+id/totalCount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center|right"
+                        android:text="总销量 0"
+                        android:textColor="#FF1493" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

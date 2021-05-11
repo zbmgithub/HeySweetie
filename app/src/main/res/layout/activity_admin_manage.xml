@@ -31,6 +31,7 @@
             android:paddingBottom="65dp">
 
             <LinearLayout
+                android:layout_marginLeft="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -51,6 +52,7 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
+                android:layout_marginLeft="10dp"
                 android:id="@+id/allAdmin_RecycleView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

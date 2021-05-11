@@ -1,5 +1,6 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.goodsmanage;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -91,6 +93,7 @@ public class GoodsManageDetailActivity extends BaseActivity implements View.OnCl
         //设置标题栏
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("商品管理");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //设置显示界面
         Glide.with(this).load(goods.getImageId()).into(goodsImage);
 
@@ -182,7 +185,7 @@ public class GoodsManageDetailActivity extends BaseActivity implements View.OnCl
                             });
                         }
                         try {
-                            sleep(500);
+                            sleep(500);//解决返回界面显示数据不同步，阻塞主进程，异步处理转同步，仍有风险
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -196,5 +199,13 @@ public class GoodsManageDetailActivity extends BaseActivity implements View.OnCl
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

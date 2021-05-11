@@ -1,5 +1,6 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.msgmanage;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,6 +8,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,10 +16,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Msg;
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.common.MemosActivity;
-import com.heysweetie.android.ui.common.MemosAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
@@ -34,7 +33,9 @@ public class MsgManageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_msg_manage);
+
         user = (User) getIntent().getSerializableExtra("user_data");
+
         initControlUnit();
         initView();
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -49,6 +50,7 @@ public class MsgManageActivity extends AppCompatActivity {
         //设置标题栏
         toolBar.setTitle("查看留言");
         setSupportActionBar(toolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -78,5 +80,12 @@ public class MsgManageActivity extends AppCompatActivity {
         toolBar = findViewById(R.id.toolBar);
         memosManage_recycler = findViewById(R.id.memosManage_recycler);
         swipeRefresh = findViewById(R.id.swipeRefresh);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 }

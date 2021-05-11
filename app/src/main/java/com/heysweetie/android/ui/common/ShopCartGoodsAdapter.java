@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
-import com.heysweetie.android.ui.admin.AdminMainActivity;
+import com.heysweetie.android.ui.admin.main.AdminMainActivity;
 import com.heysweetie.android.ui.client.ClientMainActivity;
 import com.heysweetie.android.ui.client.ShopCartActivity;
 

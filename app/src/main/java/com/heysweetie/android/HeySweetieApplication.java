@@ -79,5 +79,14 @@ public class HeySweetieApplication extends Application {
         imageId.add(R.drawable.pear);
         imageId.add(R.drawable.strawberry);
         imageId.add(R.drawable.watermelon);
+        imageId.add(R.drawable.goods1);
+        imageId.add(R.drawable.goods2);
+        imageId.add(R.drawable.goods3);
+        imageId.add(R.drawable.goods4);
+        imageId.add(R.drawable.goods5);
+        imageId.add(R.drawable.goods6);
+        imageId.add(R.drawable.goods7);
+        imageId.add(R.drawable.goods8);
+        imageId.add(R.drawable.goods9);
     }
 }

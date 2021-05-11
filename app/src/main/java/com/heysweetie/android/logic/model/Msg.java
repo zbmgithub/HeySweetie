@@ -6,12 +6,11 @@ import java.util.List;
 import cn.bmob.v3.BmobObject;
 
 public class Msg extends BmobObject {
-    private Date msgDate;
-    private String userPhone;
-    private int userImage;
-    private List<String> NickName;//每条消息的发言人名字
-    private List<String> msgContent;//消息内容
-    private List<Integer> msgType;//消息类型，0代表管理员，1代表用户
+    private Date msgDate;//客户最新留言日期
+    private String userPhone;//用户手机号
+    private int userImage;//用户头像
+    private List<String> msgContent;//顺序存放消息内容
+    private List<Integer> msgType;//顺序存放消息类型，0代表管理员，1代表用户
 
     public String getUserPhone() {
         return userPhone;
@@ -43,14 +42,6 @@ public class Msg extends BmobObject {
 
     public void setMsgType(List<Integer> msgType) {
         this.msgType = msgType;
-    }
-
-    public List<String> getNickName() {
-        return NickName;
-    }
-
-    public void setNickName(List<String> nickName) {
-        NickName = nickName;
     }
 
     public Date getMsgDate() {

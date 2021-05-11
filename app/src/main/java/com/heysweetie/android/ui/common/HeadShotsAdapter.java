@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.heysweetie.android.R;
-import com.heysweetie.android.ui.admin.AdminManageDetailActivity;
+import com.heysweetie.android.ui.admin.adminmanage.AdminManageDetailActivity;
 import com.heysweetie.android.ui.client.ClientInfoManageActivity;
 
 import java.util.List;

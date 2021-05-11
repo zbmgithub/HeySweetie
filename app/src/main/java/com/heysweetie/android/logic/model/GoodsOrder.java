@@ -10,10 +10,10 @@ public class GoodsOrder extends BmobObject {
     //父类 objectId默认为 订单编号
     private int orderState;//订单状态 0待确定,1制作中,2完成,3取消、作废
     private String username;//顾客账号=手机号
-    private String clientNote;//客户备注
+    private String clientNote;//客户备注 暂时未用
     private Date orderDate;//下单日期
-    private List<Goods> goodsList;
-    private List<Integer> countList;
+    private List<Goods> goodsList;//顺序存放订单中的商品
+    private List<Integer> countList;//顺序存放订单中商品的数量
 
     public int getOrderState() {
         return orderState;

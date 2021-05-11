@@ -14,7 +14,8 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#D8BFD8"
         android:fitsSystemWindows="true"
-        app:titleTextColor="@color/white"/>
+        app:titleTextColor="@color/white"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

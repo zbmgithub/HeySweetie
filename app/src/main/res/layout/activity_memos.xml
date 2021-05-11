@@ -14,8 +14,8 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#D8BFD8"
         android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
         app:titleTextColor="@color/white" />
-
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -53,6 +53,6 @@
                     android:text="发送" />
             </LinearLayout>
         </LinearLayout>
-
     </com.google.android.material.card.MaterialCardView>
+
 </LinearLayout>

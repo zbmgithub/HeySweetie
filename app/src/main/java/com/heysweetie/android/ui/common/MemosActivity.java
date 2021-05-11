@@ -1,11 +1,12 @@
 package com.heysweetie.android.ui.common;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,11 +14,8 @@ import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.heysweetie.android.R;
-import com.heysweetie.android.logic.model.Goods;
 import com.heysweetie.android.logic.model.Msg;
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.admin.GoodsManageActivity;
-import com.heysweetie.android.ui.admin.GoodsManageAdapter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -116,7 +114,7 @@ public class MemosActivity extends BaseActivity {
                                 }
                             });
                         }
-                        memos_recycler.scrollToPosition(msg.getMsgContent().size() - 1);
+                        memos_recycler.scrollToPosition(msg.getMsgContent().size() - 1);//定位到行尾
                     }
                 });
             }
@@ -127,6 +125,7 @@ public class MemosActivity extends BaseActivity {
         //设置标题栏
         toolBar.setTitle("查看留言");
         setSupportActionBar(toolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -158,5 +157,12 @@ public class MemosActivity extends BaseActivity {
         memos_recycler = findViewById(R.id.memos_recycler);
         memos_edit = findViewById(R.id.memos_edit);
         send = findViewById(R.id.send);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 }

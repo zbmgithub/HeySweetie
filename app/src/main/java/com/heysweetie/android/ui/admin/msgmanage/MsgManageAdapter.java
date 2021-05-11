@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.msgmanage;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -53,7 +52,7 @@ public class MsgManageAdapter extends RecyclerView.Adapter<MsgManageAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         Msg msg = msgList.get(position);
         Glide.with(context).load(msg.getUserImage()).into(holder.headShot_Image);
-        holder.userPhoneNum.setText("用户手机号 " + msg.getUserPhone());
+        holder.userPhoneNum.setText(msg.getUserPhone());
 
         //设置日期
         Date date = msg.getMsgDate();

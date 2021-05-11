@@ -1,14 +1,11 @@
 package com.heysweetie.android.ui.login;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,19 +13,19 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.User;
-import com.heysweetie.android.ui.admin.AdminMainActivity;
+import com.heysweetie.android.ui.admin.main.AdminMainActivity;
 import com.heysweetie.android.ui.client.ClientMainActivity;
 import com.heysweetie.android.ui.common.BaseActivity;
 
 import java.util.regex.Pattern;
 
 import cn.bmob.v3.BmobSMS;
-import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
@@ -44,6 +41,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private LinearLayout registerVtCodeLt;
     private LinearLayout registerBtnLt;
     private LinearLayout loginBtnLt;
+    private TextView forgetPass;
 
     private EditText passwordEdit2;
     private EditText vtCodeEdit;
@@ -72,6 +70,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginBtn = findViewById(R.id.loginBtn);
         registerBtn = findViewById(R.id.registerBtn);
         rememberPass = findViewById(R.id.rememberPassCheckBox);
+        forgetPass = findViewById(R.id.forgetPass);
         //注册时使用
         registerPassLt = findViewById(R.id.registerPassLayout);
         registerVtCodeLt = findViewById(R.id.registerVtCodeLayout);
@@ -105,6 +104,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         vtCodeBtn.setOnClickListener(this);
         okBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
+        forgetPass.setOnClickListener(this);
         rememberPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -128,6 +128,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         } else if (getId == R.id.cancelBtn) {//返回登陆界面
             //调整界面
             cancel();
+        } else if (getId == R.id.forgetPass) {//忘记密码界面
+            Intent intent = new Intent(LoginActivity.this, ForgetPassActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -137,6 +140,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         registerVtCodeLt.setVisibility(View.GONE);
         registerBtnLt.setVisibility(View.GONE);
         loginBtnLt.setVisibility(View.VISIBLE);
+        forgetPass.setVisibility(View.VISIBLE);
 
         accountEdit.setEnabled(true);
         passwordEdit.setEnabled(true);
@@ -231,7 +235,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    private boolean isValidPhoneNumber(String str) {
+    public static boolean isValidPhoneNumber(String str) {
         //根据运营商发布信息，利用正则判断手机号是否有效
         return Pattern.matches(
                 "^1(3[0-9]|5[0-3,5-9]|7[1-3,5-8]|8[0-9])\\d{8}$",
@@ -250,6 +254,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         registerVtCodeLt.setVisibility(View.VISIBLE);
         registerBtnLt.setVisibility(View.VISIBLE);
         loginBtnLt.setVisibility(View.GONE);
+        forgetPass.setVisibility(View.GONE);
     }
 
     private void login(View v) { //登录功能

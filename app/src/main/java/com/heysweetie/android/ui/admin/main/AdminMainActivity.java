@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.main;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
@@ -32,6 +32,11 @@ import com.heysweetie.android.logic.model.Goods;
 
 import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
+import com.heysweetie.android.ui.admin.adminmanage.AdminManageActivity;
+import com.heysweetie.android.ui.admin.goodsmanage.GoodsManageActivity;
+import com.heysweetie.android.ui.admin.msgmanage.MsgManageActivity;
+import com.heysweetie.android.ui.admin.ordermanage.OrderManageActivity;
+import com.heysweetie.android.ui.admin.statistic.StatisticActivity;
 import com.heysweetie.android.ui.common.BaseActivity;
 import com.heysweetie.android.ui.common.GoodsAdapter;
 import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
@@ -48,27 +53,27 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 
-
+//管理员界面的主页面，为所有上架商品的浏览界面+滑动菜单
 public class AdminMainActivity extends BaseActivity implements View.OnClickListener {
 
     private User user;
     //滑动菜单组件
-    private NavigationView navView;
-    private DrawerLayout drawerLayout;
-    private TextView phoneText;
-    private TextView nickName;
-    private Button quitBtn;
-    private ImageView headShot_Image;
+    private NavigationView navView;//滑动菜单布局，用来寻找滑动菜单上的控件
+    private DrawerLayout drawerLayout;//滑动菜单父布局，这个属性用来展示滑动菜单或者关闭
+    private TextView phoneText;//是用户的话这里显示用户手机号，管理员则显示权限，由于共用的一个navHeader布局
+    private TextView nickName;//管理员昵称
+    private Button quitBtn;//退出登录
+    private ImageView headShot_Image;//显示头像
 
     //主界面组件
-    private SwipeRefreshLayout swipeRefresh;
-    private RecyclerView goods_recyclerView;
-    private MaterialToolbar toolbar;
-    private static TextView shopCartTotalPrice;
-    private static TextView shopCartTotalCount;
-    private TextView goToDeal;
-    private LinearLayout shop_cart;
-    private RecyclerView shopCartRecyclerView;
+    private SwipeRefreshLayout swipeRefresh;//下拉刷新
+    private RecyclerView goods_recyclerView;//显示商品
+    private MaterialToolbar toolbar;//自定义标题栏
+    private static TextView shopCartTotalPrice;//购物车栏显示商品总金额
+    private static TextView shopCartTotalCount;//购物车栏显示商品总数量
+    private TextView goToDeal;//去结算
+    private LinearLayout shop_cart;//购物车栏
+    private RecyclerView shopCartRecyclerView;//购物车详细商品信息
     private static MaterialCardView shopCartView;
     private TextView cleanShopCart;
 
@@ -76,20 +81,13 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
+        user = (User) getIntent().getSerializableExtra("user_data");
         //初始化控件
         initControlUnit();
         //初始化显示界面
         initView();
         //初始化点击事件
         initClick();
-
-        //设置下拉刷新显示商品界面
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refresh(goods_recyclerView);
-            }
-        });
     }
 
     //初始化控件
@@ -120,10 +118,9 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
         //设置自定义标题栏
         toolbar.setTitle("所有上架商品");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//标题栏Home键
 
-        //初始化滑动菜单的header部分，将用户的昵称，手机号添加到header里
-        user = (User) getIntent().getSerializableExtra("user_data");
+        //初始化滑动菜单的header部分
         Glide.with(navView).load(user.getUserImageId()).into(headShot_Image);
         phoneText.setText(user.getAdmin() == 1 ? "普通管理员" : "超级管理员");
         nickName.setText(user.getUserNickName());
@@ -131,12 +128,13 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
         navView.setCheckedItem(R.id.goods_onSale);
 
         //显示当前所有上架商品
-        refresh(goods_recyclerView);//刷新商品界面
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        goods_recyclerView.setLayoutManager(layoutManager);
+        goods_recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        refresh();//刷新商品界面
 
         //设置下拉刷新时，刷新等待圈颜色
         swipeRefresh.setColorSchemeResources(R.color.design_default_color_primary);
+        //购物车详细信息布局
+        shopCartRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 
     //初始化点击事件
@@ -145,61 +143,67 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
         goToDeal.setOnClickListener(this);//去结算点击事件
         shop_cart.setOnClickListener(this);//购物车栏点击事件
         cleanShopCart.setOnClickListener(this);//清空购物车
-
+        //设置下拉刷新显示商品界面
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
         //设置滑动菜单的点击事件
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.goods_onSale)
-                    drawerLayout.closeDrawers();//默认购物界面为主界面，所以关闭就好
-                else if (id == R.id.goods_manage) {
+                    drawerLayout.closeDrawers();//默认购物界面为主界面，所以关闭滑动菜单就好
+                else if (id == R.id.goods_manage) {//商品管理
                     Intent intent = new Intent(AdminMainActivity.this, GoodsManageActivity.class);
                     if (user.getAdmin() > 1) {//超级管理员才可以打开
                         startActivity(intent);
                     }
-                } else if (id == R.id.order_manage) {
+                } else if (id == R.id.order_manage) {//订单管理
                     Intent intent = new Intent(AdminMainActivity.this, OrderManageActivity.class);
                     if (user.getAdmin() > 0) {
                         startActivity(intent);
                     }
-                } else if (id == R.id.admin_manage) {
+                } else if (id == R.id.admin_manage) {//管理员管理
                     Intent intent = new Intent(AdminMainActivity.this, AdminManageActivity.class);
                     if (user.getAdmin() > 1) {//超级管理员才可以打开
                         startActivity(intent);
                     }
-                } else if (id == R.id.msg_manage) {
+                } else if (id == R.id.msg_manage) {//留言管理
                     Intent intent = new Intent(AdminMainActivity.this, MsgManageActivity.class);
                     if (user.getAdmin() > 0) {
                         intent.putExtra("user_data", user);
                         startActivity(intent);
                     }
-                } else if (id == R.id.statistic) {
+                } else if (id == R.id.statistic) {//统计数据
                     Intent intent = new Intent(AdminMainActivity.this, StatisticActivity.class);
                     if (user.getAdmin() > 1) {
                         startActivity(intent);
                     }
                 } else {
                     drawerLayout.closeDrawers();
-                    Toast.makeText(AdminMainActivity.this, "跳转到其他界面", Toast.LENGTH_SHORT).show();
                 }
-                closeShopCarListView();
+                closeShopCarListView();//每次跳转到其他界面都关闭购物车的详细信息
                 return true;
             }
         });
     }
 
     //刷新当前显示的商品
-    private void refresh(RecyclerView recyclerView) {
+    private void refresh() {
         List<Goods> goodsList = new ArrayList<>();
         BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
-        query.setLimit(500).order("-createdAt").addWhereNotEqualTo("goodsState", 1).findObjects(new FindListener<Goods>() {
+        //根据创建时间排序，且商品状态不能为1，即下架
+        query.order("-createdAt").addWhereNotEqualTo("goodsState", 1).findObjects(new FindListener<Goods>() {
             @Override
             public void done(List<Goods> object, BmobException e) {
                 if (e == null) {
                     goodsList.addAll(object);//将获取的商品添加到列表
-                    GoodsAdapter adapter = new GoodsAdapter(AdminMainActivity.this, goodsList, user);//所有商品添加到适配器
-                    goods_recyclerView.setAdapter(adapter);//为recyclerView设置适配器
+                    goods_recyclerView.setAdapter(new GoodsAdapter(AdminMainActivity.this, goodsList, user));
+                    //所有商品添加到适配器，为recyclerView设置适配器
 
                     //每次刷新商品时，同时刷新购物车中的商品数据，防止数据显示不统一的bug
                     for (Goods goods : goodsList) {
@@ -222,8 +226,8 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
                             }
                         }
                     }
-                    refreshShopCar();
-                    //结束刷新
+                    refreshShopCar();//刷新购物车栏
+                    //结束刷新进度条
                     swipeRefresh.setRefreshing(false);
                 } else {
                 }
@@ -244,23 +248,18 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
             //当前购物车总价=当前商品价格*折扣*数量+其余商品...
             price += key.getPrice() * key.getSale() * tempCount;
         }
-        //设置为两位小数
-        double priceOutput = Double.parseDouble(String.format("%.2f", price));
-        shopCartTotalPrice.setText(priceOutput + "");
-
+        //设置购物车总金额 double为两位小数
+        shopCartTotalPrice.setText(Double.parseDouble(String.format("%.2f", price)) + "");
         //设置购物车数量显示
         shopCartTotalCount.setText(count + "");
-
     }
-
 
     @Override
     protected void onResume() {
         //滑动菜单默认选中子项
         navView.setCheckedItem(R.id.goods_onSale);
-        refresh(goods_recyclerView);//每次重新获取到显示界面，刷新购物车栏
+        refresh();//每次重新获取到显示界面，刷新主界面
         super.onResume();
-        //Toast.makeText(this, "Resume activate", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -276,7 +275,6 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
             goToDeal();
         } else if (getId == R.id.shop_cart) {
             if (shopCartView.getVisibility() == View.GONE) {//显示购物车详细信息
-                //设置可见性 这样设置显示是为了处理count数据不同步可能产生的bug
                 shopCartView.setVisibility(View.VISIBLE);
                 //构造购物车详细信息界面
                 List<Goods> goodsList = new ArrayList<>();
@@ -288,12 +286,10 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
                         HeySweetieApplication.shopCartMap.remove(key);//清除所有数量为0的商品
                     }
                 }
-                ShopCartGoodsAdapter adapter = new ShopCartGoodsAdapter(AdminMainActivity.this, goodsList);//所有商品添加到适配器
-                shopCartRecyclerView.setAdapter(adapter);//为recyclerView设置适配器
-                shopCartRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
+                //添加商品到shopCartRecyclerView
+                shopCartRecyclerView.setAdapter(new ShopCartGoodsAdapter(AdminMainActivity.this, goodsList));
             } else {
-                //设置可见性 再次点击购物车栏关闭购物车详细信息
+                //再次点击购物车栏关闭购物车详细信息
                 closeShopCarListView();
             }
         } else if (getId == R.id.cleanShopCart) {//清空购物车
@@ -312,7 +308,7 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
         Set<Goods> keys = HeySweetieApplication.shopCartMap.keySet();
         for (Goods key : keys) {
             int count = HeySweetieApplication.shopCartMap.get(key);
-            if (count > 0) {//将购物车中数量大于一商品的添加list
+            if (count > 0) {//将购物车中数量大于0商品的添加list
                 goodsList.add(key);
                 countList.add(count);
             }
@@ -328,7 +324,7 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
                         HeySweetieApplication.shopCartMap.clear();
                         refreshShopCar();
                         closeShopCarListView();
-                        Toast.makeText(AdminMainActivity.this, "结算成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AdminMainActivity.this, "结算成功，在查看订单中查询进度", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(AdminMainActivity.this, "结算失败", Toast.LENGTH_SHORT).show();
                     }

@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.ordermanage;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 import com.heysweetie.android.logic.model.GoodsOrder;
-import com.heysweetie.android.logic.model.User;
 import com.heysweetie.android.ui.common.GoodsOrderDetailAdapter;
 
 import java.text.DateFormat;

@@ -1,4 +1,4 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.adminmanage;
 
 import android.content.Context;
 import android.content.Intent;

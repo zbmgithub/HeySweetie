@@ -1,5 +1,6 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.statistic;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -16,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.heysweetie.android.HeySweetieApplication;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 import com.heysweetie.android.logic.model.GoodsOrder;
@@ -27,9 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,13 +53,16 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
     private Button monthBtn;
     private Button yearBtn;
     private Button allBtn;
-    private TextView totalInfo;
+    private TextView totalPrice_Text;
+    private TextView totalCount_Text;
     private RecyclerView goodsSaleCount_recycler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistic);
+
+        calendar = Calendar.getInstance();
 
         initControlUnit();
         initView();
@@ -96,7 +98,8 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
         monthBtn = findViewById(R.id.monthBtn);
         yearBtn = findViewById(R.id.yearBtn);
         allBtn = findViewById(R.id.allBtn);
-        totalInfo = findViewById(R.id.totalInfo);
+        totalPrice_Text = findViewById(R.id.totalPrice);
+        totalCount_Text = findViewById(R.id.totalCount);
         goodsSaleCount_recycler = findViewById(R.id.goodsSaleCount_recycler);
     }
 
@@ -104,7 +107,8 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
         //设置标题栏
         toolBar.setTitle("统计数据");
         setSupportActionBar(toolBar);
-        calendar = Calendar.getInstance();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -114,8 +118,6 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
 
     void refresh() {
         //刷新前先清空
-        goodsCountSale.clear();
-        goodsPriceSale.clear();
         Set<Goods> keys = goodsPriceSale.keySet();
         for (Goods key : keys) {
             goodsCountSale.put(key, new Integer(0));
@@ -218,7 +220,7 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
                     List<Map.Entry<Goods, Integer>> list = new ArrayList<Map.Entry<Goods, Integer>>(goodsCountSale.entrySet());
                     //然后通过比较器来实现排序
                     Collections.sort(list, new Comparator<Map.Entry<Goods, Integer>>() {
-                        //升序排序
+                        //降序排序
                         @Override
                         public int compare(Map.Entry<Goods, Integer> o1, Map.Entry<Goods, Integer> o2) {
                             return o2.getValue().compareTo(o1.getValue());
@@ -234,7 +236,8 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
                     }
 
                     goodsSaleCount_recycler.setAdapter(new StatisticAdapter(StatisticActivity.this, goodsList, countList, goodsPriceSale));
-                    totalInfo.setText("总销售额￥" + Double.parseDouble(String.format("%.2f", totalPrice)) + "       总销量 " + totalCount);
+                    totalPrice_Text.setText("总销售额￥" + Double.parseDouble(String.format("%.2f", totalPrice)));
+                    totalCount_Text.setText("总销量 " + totalCount);
                 } else {
                     Toast.makeText(StatisticActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                 }
@@ -242,7 +245,7 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
         });
     }
 
-    public void showDatePicker() {
+    public void showDatePicker() {//弹出日历
         calendar = Calendar.getInstance();
         View datePickerView = LayoutInflater.from(StatisticActivity.this).inflate(R.layout.date_picker_dialog, null);
         DatePicker datePicker = datePickerView.findViewById(R.id.date_picker);
@@ -283,5 +286,12 @@ public class StatisticActivity extends AppCompatActivity implements View.OnClick
             flag = 3;
             refresh();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 }

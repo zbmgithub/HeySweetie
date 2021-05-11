@@ -1,16 +1,19 @@
-package com.heysweetie.android.ui.admin;
+package com.heysweetie.android.ui.admin.ordermanage;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.ui.common.BaseActivity;
@@ -29,9 +32,9 @@ public class OrderManageActivity extends BaseActivity implements View.OnClickLis
     private List<GoodsOrder> goodsOrderList;
     private RecyclerView goodsOrder_RecycleView;
     private SwipeRefreshLayout swipeRefresh;
-    private TextView back_Text;
     private Button find_Btn;
     private EditText userPhoneNum_Edit;
+    private MaterialToolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,21 +54,25 @@ public class OrderManageActivity extends BaseActivity implements View.OnClickLis
     private void initControUnit() {
         goodsOrder_RecycleView = findViewById(R.id.goodsOrder_RecycleView);
         swipeRefresh = findViewById(R.id.swipeRefresh);
-        back_Text = findViewById(R.id.back_Text);
         find_Btn = findViewById(R.id.find_Btn);
         userPhoneNum_Edit = findViewById(R.id.userPhoneNum_Edit);
+        toolbar = findViewById(R.id.toolbar);
     }
 
     private void initView() {
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
+        //标题栏设置
+        toolbar.setTitle("订单管理");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         goodsOrder_RecycleView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         getOrder();
     }
 
     private void initClick() {
-        back_Text.setOnClickListener(this);
         find_Btn.setOnClickListener(this);
     }
 
@@ -119,5 +126,12 @@ public class OrderManageActivity extends BaseActivity implements View.OnClickLis
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 }
