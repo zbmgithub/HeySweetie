@@ -3,11 +3,13 @@ package com.heysweetie.android.ui.common;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +21,12 @@ import com.heysweetie.android.logic.model.User;
 import com.heysweetie.android.ui.admin.main.AdminMainActivity;
 import com.heysweetie.android.ui.client.ClientMainActivity;
 
+import java.io.File;
 import java.util.List;
+
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.DownloadFileListener;
 
 public class GoodsAdapter extends RecyclerView.Adapter<GoodsAdapter.ViewHolder> {
     private List<Goods> goodsList;
@@ -78,8 +85,15 @@ public class GoodsAdapter extends RecyclerView.Adapter<GoodsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Goods goods = goodsList.get(position);
         holder.goodsName.setText(goods.getGoodsName());
-
-        Glide.with(context).load(goods.getImageId()).into(holder.goodsImage);
+        if (goods.getGoodsImage() != null) {//显示商品图片为传递过来的商品图片
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), goods.getGoodsImageName() + ".jpg");
+            if (file.exists())
+                Glide.with(context).load(file).into(holder.goodsImage);
+            else {
+                Glide.with(context).load(goods.getGoodsImage().getUrl()).into(holder.goodsImage);
+                //解决图片未下载完成时，图片显示空白
+            }
+        }
     }
 
     @Override

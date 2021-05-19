@@ -31,6 +31,7 @@ import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 
 
+
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private EditText accountEdit;
     private EditText passwordEdit;

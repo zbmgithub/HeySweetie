@@ -1,11 +1,10 @@
 package com.heysweetie.android.logic.model;
 
-import android.util.Log;
-
 import java.io.Serializable;
 import java.util.Date;
 
 import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.datatype.BmobFile;
 
 public class Goods extends BmobObject implements Serializable, Comparable<Goods> {
     //父类默认有唯一标志 String objectId; 作为商品编号
@@ -19,7 +18,8 @@ public class Goods extends BmobObject implements Serializable, Comparable<Goods>
     private double sale = 1;//商品折扣 0~1 0.6表示6折
     private Date saleBeginTime = null;//折扣开始时间 暂时未用到
     private Date saleEndTime = null;//折扣结束时间 暂时未用到
-    private int imageId = 0;//商品图片id
+    private BmobFile goodsImage;//商品图片
+    private  String goodsImageName;//商品图片文件名
 
     public int getGoodsState() {
         return goodsState;
@@ -101,13 +101,6 @@ public class Goods extends BmobObject implements Serializable, Comparable<Goods>
         this.saleEndTime = saleEndTime;
     }
 
-    public int getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(int imageId) {
-        this.imageId = imageId;
-    }
 
     //重写hashcode方法和equals方法是为了使用hashmap实现购物车功能：把goods作为key，数量作为value
     //BmobObject的objectId可以保证商品唯一，所以可以借助这个方便的实现重写
@@ -132,5 +125,21 @@ public class Goods extends BmobObject implements Serializable, Comparable<Goods>
     @Override
     public int compareTo(Goods o) {
         return getObjectId().compareTo(o.getObjectId());
+    }
+
+    public BmobFile getGoodsImage() {
+        return goodsImage;
+    }
+
+    public void setGoodsImage(BmobFile goodsImage) {
+        this.goodsImage = goodsImage;
+    }
+
+    public String getGoodsImageName() {
+        return goodsImageName;
+    }
+
+    public void setGoodsImageName(String goodsImageName) {
+        this.goodsImageName = goodsImageName;
     }
 }

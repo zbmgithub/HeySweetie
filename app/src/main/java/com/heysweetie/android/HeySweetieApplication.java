@@ -5,12 +5,12 @@ import android.app.Application;
 import android.content.Context;
 
 import com.heysweetie.android.logic.model.Goods;
-import com.heysweetie.android.logic.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import cn.bmob.v3.Bmob;
 
@@ -89,4 +89,5 @@ public class HeySweetieApplication extends Application {
         imageId.add(R.drawable.goods8);
         imageId.add(R.drawable.goods9);
     }
+
 }

@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -28,21 +30,27 @@ import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
+import com.heysweetie.android.ui.admin.main.AdminMainActivity;
 import com.heysweetie.android.ui.common.BaseActivity;
 import com.heysweetie.android.ui.common.GoodsAdapter;
 import com.heysweetie.android.ui.common.MemosActivity;
 import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 import com.heysweetie.android.ui.login.LoginActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+
+import static com.heysweetie.android.HeySweetieApplication.context;
 
 public class ClientMainActivity extends BaseActivity implements View.OnClickListener {
     private User user;
@@ -81,7 +89,7 @@ public class ClientMainActivity extends BaseActivity implements View.OnClickList
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh(goods_recyclerView);
+                refresh();
             }
         });
     }
@@ -123,7 +131,7 @@ public class ClientMainActivity extends BaseActivity implements View.OnClickList
         //滑动菜单默认选中子项
         navView.setCheckedItem(R.id.goods_onSale);
         //显示所有上架商品
-        refresh(goods_recyclerView);//刷新商品界面
+        refresh();//刷新商品界面
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         goods_recyclerView.setLayoutManager(layoutManager);
         //设置下拉刷新栏颜色
@@ -189,18 +197,43 @@ public class ClientMainActivity extends BaseActivity implements View.OnClickList
         shopCartTotalCount.setText(count + "");
 
     }
-
     //刷新当前显示的商品
-    private void refresh(RecyclerView recyclerView) {
+    private void refresh() {
         List<Goods> goodsList = new ArrayList<>();
         BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
-        query.setLimit(500).order("-createdAt").addWhereNotEqualTo("goodsState", 1).findObjects(new FindListener<Goods>() {
+        //根据创建时间排序，且商品状态不能为1，即下架
+        query.order("-createdAt").addWhereNotEqualTo("goodsState", 1).findObjects(new FindListener<Goods>() {
             @Override
             public void done(List<Goods> object, BmobException e) {
                 if (e == null) {
+                    //获取商品图片
+                    SharedPreferences preferences = context.getSharedPreferences("imageUpdateTime", MODE_PRIVATE);
+                    for (Goods goods : object) {
+                        BmobFile goodsImage = goods.getGoodsImage();
+                        //如果图片不存在本地指定路径，或者照片日期，与最新的更新时期不一致，那么重新下载图片
+                        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), goods.getGoodsImageName() + ".jpg");
+                        if (goodsImage != null)
+                            if (!file.exists() || !preferences.getString(goods.getObjectId(), "").equals(goods.getUpdatedAt())) {
+                                goodsImage.download(file, new DownloadFileListener() {
+                                    @Override
+                                    public void done(String savePath, BmobException e) {
+                                        if (e == null) {
+                                        } else {
+                                            Toast.makeText(ClientMainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onProgress(Integer value, long total) {
+
+                                    }
+                                });
+                            }
+                        preferences.edit().putString(goods.getObjectId(), goods.getUpdatedAt()).apply();
+                    }
                     goodsList.addAll(object);//将获取的商品添加到列表
-                    GoodsAdapter adapter = new GoodsAdapter(ClientMainActivity.this, goodsList, user);//所有商品添加到适配器
-                    goods_recyclerView.setAdapter(adapter);//为recyclerView设置适配器
+                    goods_recyclerView.setAdapter(new GoodsAdapter(ClientMainActivity.this, goodsList, user));
+                    //所有商品添加到适配器，为recyclerView设置适配器
 
                     //每次刷新商品时，同时刷新购物车中的商品数据，防止数据显示不统一的bug
                     for (Goods goods : goodsList) {
@@ -223,8 +256,8 @@ public class ClientMainActivity extends BaseActivity implements View.OnClickList
                             }
                         }
                     }
-                    refreshShopCar();
-                    //结束刷新
+                    refreshShopCar();//刷新购物车栏
+                    //结束刷新进度条
                     swipeRefresh.setRefreshing(false);
                 } else {
                 }

@@ -17,7 +17,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HeySweetie">
+        android:theme="@style/Theme.HeySweetie"
+        android:networkSecurityConfig="@xml/network_security_config"
+        >
         <activity android:name=".ui.login.ForgetPassActivity"></activity>
         <activity android:name=".ui.admin.statistic.StatisticActivity" />
         <activity android:name=".ui.admin.msgmanage.MsgManageActivity" />

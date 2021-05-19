@@ -11,9 +11,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.os.Environment;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +44,7 @@ import com.heysweetie.android.ui.common.GoodsAdapter;
 import com.heysweetie.android.ui.common.ShopCartGoodsAdapter;
 import com.heysweetie.android.ui.login.LoginActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,9 +52,13 @@ import java.util.Set;
 
 import cn.bmob.v3.BmobQuery;
 
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+
+import static com.heysweetie.android.HeySweetieApplication.context;
 
 //管理员界面的主页面，为所有上架商品的浏览界面+滑动菜单
 public class AdminMainActivity extends BaseActivity implements View.OnClickListener {
@@ -88,6 +95,7 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
         initView();
         //初始化点击事件
         initClick();
+
     }
 
     //初始化控件
@@ -201,6 +209,33 @@ public class AdminMainActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void done(List<Goods> object, BmobException e) {
                 if (e == null) {
+                    //获取商品图片
+                    SharedPreferences preferences = context.getSharedPreferences("imageUpdateTime", MODE_PRIVATE);
+                    for (Goods goods : object) {
+                        BmobFile goodsImage = goods.getGoodsImage();
+                        //如果图片不存在本地指定路径，或者照片日期，与最新的更新时期不一致，那么重新下载图片
+                        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), goods.getGoodsImageName() + ".jpg");
+                        if (goodsImage != null)
+                            if (!file.exists() || !preferences.getString(goods.getObjectId(), "").equals(goods.getUpdatedAt())) {
+                                goodsImage.download(file, new DownloadFileListener() {
+                                    @Override
+                                    public void done(String savePath, BmobException e) {
+                                        if (e == null) {
+                                        } else {
+                                            Toast.makeText(AdminMainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onProgress(Integer value, long total) {
+
+                                    }
+                                });
+                            }
+                        preferences.edit().putString(goods.getObjectId(), goods.getUpdatedAt()).apply();
+                    }
+
+
                     goodsList.addAll(object);//将获取的商品添加到列表
                     goods_recyclerView.setAdapter(new GoodsAdapter(AdminMainActivity.this, goodsList, user));
                     //所有商品添加到适配器，为recyclerView设置适配器

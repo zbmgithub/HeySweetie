@@ -81,7 +81,7 @@ public class GoodsManageActivity extends BaseActivity {
     //刷新当前显示的商品
     private void refreshGoods() {
         List<Goods> goodsList = new ArrayList<>();
-        BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品状态不为下架的商品
+        BmobQuery<Goods> query = new BmobQuery<>();//从数据库中获取所有商品
         query.order("-createdAt").findObjects(new FindListener<Goods>() {
             @Override
             public void done(List<Goods> object, BmobException e) {

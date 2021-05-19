@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +27,7 @@ import com.heysweetie.android.logic.model.GoodsOrder;
 import com.heysweetie.android.logic.model.User;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,8 +101,8 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         //半透明状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-
-        Glide.with(this).load(goods.getImageId()).into(goodsImage);//显示商品图片为传递过来的商品图片
+        if (goods.getGoodsImage() != null)//显示商品图片为传递过来的商品图片
+            Glide.with(this).load(new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), goods.getGoodsImageName() + ".jpg")).into(goodsImage);
         toolbar.setTitle(goods.getGoodsName());//设置标题栏文字为商品名
         setSupportActionBar(toolbar);//显示标题栏为自定义标题栏
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//设置home按钮

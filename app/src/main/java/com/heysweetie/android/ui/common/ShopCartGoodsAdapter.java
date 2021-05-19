@@ -2,6 +2,7 @@ package com.heysweetie.android.ui.common;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.heysweetie.android.ui.admin.main.AdminMainActivity;
 import com.heysweetie.android.ui.client.ClientMainActivity;
 import com.heysweetie.android.ui.client.ShopCartActivity;
 
+import java.io.File;
 import java.util.List;
 
 public class ShopCartGoodsAdapter extends RecyclerView.Adapter<ShopCartGoodsAdapter.ViewHolder> {
@@ -112,7 +114,8 @@ public class ShopCartGoodsAdapter extends RecyclerView.Adapter<ShopCartGoodsAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Goods goods = goodsList.get(position);
         holder.goodsName.setText(goods.getGoodsName());
-        Glide.with(context).load(goods.getImageId()).into(holder.goodsImage);
+        if (goods.getGoodsImage() != null)
+            Glide.with(context).load(new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), goods.getGoodsImageName() + ".jpg")).into(holder.goodsImage);
         int count = HeySweetieApplication.shopCartMap.get(goods);
         double price = goods.getPrice() * goods.getSale() * count;
         double priceOutput = Double.parseDouble(String.format("%.2f", price));

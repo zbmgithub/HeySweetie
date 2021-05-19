@@ -14,8 +14,8 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#D8BFD8"
         android:fitsSystemWindows="true"
-        app:titleTextColor="@color/white"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:titleTextColor="@color/white" />
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -53,11 +53,13 @@
                         android:gravity="center"
                         android:text="商品图片选择" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/allGodosImageRecylcerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="#f2f2f2" />
+                    <Button
+                        android:id="@+id/localImageBtn"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="本地图片"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="20dp"/>
                 </LinearLayout>
 
                 <LinearLayout

@@ -5,6 +5,7 @@
     android:background="@drawable/login_test"
     android:orientation="vertical">
 
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
@@ -152,9 +153,9 @@
 
     <TextView
         android:id="@+id/forgetPass"
-        android:layout_gravity="right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="right"
         android:layout_marginRight="40dp"
         android:clickable="true"
         android:text="忘记密码"

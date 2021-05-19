@@ -1,6 +1,7 @@
 package com.heysweetie.android.ui.admin.statistic;
 
 import android.content.Context;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.heysweetie.android.R;
 import com.heysweetie.android.logic.model.Goods;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +59,8 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Goods goods = goodsList.get(position);
-        Glide.with(context).load(goods.getImageId()).into(holder.goodsImage);
+        if (goods.getGoodsImage() != null)
+            Glide.with(context).load(new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), goods.getGoodsImageName() + ".jpg")).into(holder.goodsImage);
         holder.goodsName.setText(goods.getGoodsName());
         holder.totalPrice.setText("¥ " + Double.parseDouble(String.format("%.2f", goodsPriceSale.get(goods))));
         holder.saleCount.setText("销量 " + countList.get(position));
